@@ -18,7 +18,7 @@ retention_time = float(spectrum_dict['params']['rtinseconds'])
 peptide = 'WNQLQAFWGTGK'
 '''
 
-def ms2_visulizer(ms2_info_dict:dict,spectra_no:int, peptide:str,saved_file_path:str):
+def ms2_visulizer(ms2_info_dict:dict,spectra_no:int, peptide:str,saved_file_path:str,input_file:str):
     """
     plot the ms2 peak give spectrum number and peptide sequence
     -----
@@ -49,7 +49,7 @@ def ms2_visulizer(ms2_info_dict:dict,spectra_no:int, peptide:str,saved_file_path
     fig, ax = plt.subplots(figsize=(12, 6))
     sup.spectrum(spectrum, ax=ax)
     plt.title(peptide+' spectrum number: '+str(spectra_no)+' retention time: '+str(ret_time))
-    plt.savefig(saved_file_path+peptide+str(spectra_no)+'.png')
+    plt.savefig(saved_file_path+peptide+'_'+input_file+'_'+str(spectra_no)+'.png')
     #plt.show()
     plt.close()
 
@@ -63,6 +63,7 @@ print (ms2_path)
 dta_path = glob('D:/data/Mankin/search_result/dta_result2/'+'*.dta')
 print (dta_path)
 
+'''
 for ms2,dta in zip(ms2_path,dta_path):
     ms2_info_dict = ms2_info_reader(ms2)
     peptide_spectrum_dict = dta_info_reader(dta)
@@ -70,4 +71,39 @@ for ms2,dta in zip(ms2_path,dta_path):
         for each_spectrum in peptide_spectrum_dict[each_pep]:
             ms2_visulizer(ms2_info_dict,each_spectrum,each_pep,
                           'D:/data/Mankin/ms2_spectrum/'+ms2.split('\\')[1].split('.')[0]+'/')
+'''
+import pickle as ppp
+from psm_reader import peptide_file_spectra_generator
+from collections import defaultdict
+from glob import glob
+peptide_list = ppp.load(open('frac_peptide_list_of_list.p', 'rb'))
+control_pep_list = ppp.load(open('extend_pep_in_control.p','rb'))
+psm_path = 'D:/data/Mankin/search_result/20200129_merged_gln_tyr/ctrl/psm.tsv'
+peptides_info_dict = peptide_file_spectra_generator(psm_path)
 
+
+
+ms2_info_dict_of_dict = ppp.load(open('frac_ms2_dict.p','rb'))
+
+
+total_len = 0
+except_peptides = defaultdict(list)
+for each_pep in list(set(control_pep_list)):
+    print (each_pep)
+    
+    file_spctra_dict = defaultdict(list)
+    for each in peptides_info_dict[each_pep]:
+        file_spctra_dict[each[0]].append(each[1])
+    for each_file in file_spctra_dict:
+        print (each_file)
+        ms2_info_dict = ms2_info_dict_of_dict['D:/data/Mankin/Shura_Ribo_2020/2020_01_24_ms2'+'\\'+each_file+'_clean.ms2']
+        for each_spectra in file_spctra_dict[each_file]:
+            try:
+                ms2_visulizer(ms2_info_dict,each_spectra,each_pep,'D:/data/Mankin/Shura_Ribo_2020/2020_01_24_ms2/ctrl/'
+                              ,'_'.join(each_file.split('_')[-2:]))
+            except ValueError:
+                except_peptides[each_pep].append((each_file,each_spectra))
+    total_len+=1
+    print (total_len)
+
+print (except_peptides)

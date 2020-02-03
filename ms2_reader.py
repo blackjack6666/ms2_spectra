@@ -7,7 +7,7 @@ def ms2_info_reader(ms2_path:str):
 
     info_dict = {}
     with open(ms2_path,'r') as f:
-        f_read = f.read()
+        f_read = f.read().rstrip('\r\n')
         # split file
         f_split = f_read.split('\nS')[1:]
         for each in f_split:

@@ -12,11 +12,30 @@ def peptide_spectra_dict(psm_tsv:str):
         for line in f:
             line_split = line.split('\t')
             pep_seq = line_split[1]
-            spectra_number = line_split[0].split('.')[-2]
+            spectra_number = int(line_split[0].split('.')[-2])
             info_dict[pep_seq].append(spectra_number)
     return info_dict
 
-def spectra_info_generator(psm_tsv):
+def peptide_file_spectra_dict(psm_tsv:str):
+    """
+    get peptide-file-spectra dictionary
+    :param psm_tsv:
+    :return:
+    """
+    from collections import defaultdict
+    info_dict = defaultdict(list)
+    with open(psm_tsv, 'r') as f:
+        for i in range(1):
+            next(f)
+        for line in f:
+            line_split = line.split('\t')
+            pep_seq = line_split[1]
+            spectra_number = int(line_split[0].split('.')[-2])
+            file_name = line_split[0].split('.')[0]
+            info_dict[pep_seq].append((file_name,spectra_number))
+    return info_dict
+
+def  spectra_info_generator(psm_tsv):
     """
     read psm line by line, file_spectra as key, the rest as value
     :param psm_path:
@@ -67,7 +86,7 @@ def peptide_file_spectra_generator(psm_tsv:str):
             line_split = line.split('\t')
             pep_seq = line_split[1]
             file_name = line_split[0].split('.')[0]
-            spectra_number = line_split[0].split('.')[-2]
+            spectra_number = int(line_split[0].split('.')[-2])
             info_dict[pep_seq].append((file_name,spectra_number))
 
     return info_dict
@@ -133,9 +152,10 @@ def psm_compare(psm_path1,psm_path2,target_peptide):
         print('Total spectrum = %i, No same spectrum found' % len(spectrum_list))
     else:
         print('Total spectrum = %i, found %i same spectrum' % (len(spectrum_list),same_spectrum_count))
-    return None
+    return same_spectrum_count
 
-psm_path1 = 'D:/data/Mankin/search_result/20200129_merged_gln_tyr/api1/psm.tsv'
-psm_path2 = 'D:/data/Mankin/search_result/20200129_noextension_databs/api1/psm.tsv'
-target_peptide = 'KPTLPVAAWEIR'
+
+psm_path1 = 'D:/data/Mankin/search_result/20200129_merged_gln_tyr/ctrl/psm.tsv'
+psm_path2 = 'D:/data/Mankin/search_result/20200129_noextension_databs/ctrl/psm.tsv'
+target_peptide = 'NVVVVYR'
 psm_compare(psm_path1,psm_path2,target_peptide)
