@@ -36,19 +36,19 @@ def ms2_visulizer(ms2_info_dict:dict,spectra_no:int, peptide:str,saved_file_path
         retention_time=ret_time, peptide=peptide)
 
     # Process the MS/MS spectrum.
-    fragment_tol_mass = 10
+    fragment_tol_mass = 50
     fragment_tol_mode = 'ppm'
-    spectrum = (spectrum.set_mz_range(min_mz=100, max_mz=1400)
+    spectrum = (spectrum.set_mz_range(min_mz=100, max_mz=2000)
                 .remove_precursor_peak(fragment_tol_mass, fragment_tol_mode)
-                .filter_intensity(min_intensity=0.05, max_num_peaks=50)
-                .scale_intensity('root')
+                .filter_intensity(min_intensity=0.005, max_num_peaks=200)
+                .scale_intensity()
                 .annotate_peptide_fragments(fragment_tol_mass, fragment_tol_mode,
                                         ion_types='aby'))
 
     # Plot the MS/MS spectrum.
     fig, ax = plt.subplots(figsize=(12, 6))
     sup.spectrum(spectrum, ax=ax)
-    plt.title(peptide+' spectrum number: '+str(spectra_no)+' retention time: '+str(ret_time))
+    plt.title(input_file+' '+peptide+' spec: '+str(spectra_no)+' ret time: '+str(ret_time)+ ' charge: '+str(charge1))
     plt.savefig(saved_file_path+peptide+'_'+input_file+'_'+str(spectra_no)+'.png')
     #plt.show()
     plt.close()
@@ -78,7 +78,7 @@ from collections import defaultdict
 from glob import glob
 peptide_list = ppp.load(open('frac_peptide_list_of_list.p', 'rb'))
 control_pep_list = ppp.load(open('extend_pep_in_control.p','rb'))
-psm_path = 'D:/data/Mankin/search_result/20200129_merged_gln_tyr/ctrl/psm.tsv'
+psm_path = 'D:/data/Mankin/search_result/20200129_merged_gln_tyr/api05/psm.tsv'
 peptides_info_dict = peptide_file_spectra_generator(psm_path)
 
 
@@ -99,7 +99,7 @@ for each_pep in list(set(control_pep_list)):
         ms2_info_dict = ms2_info_dict_of_dict['D:/data/Mankin/Shura_Ribo_2020/2020_01_24_ms2'+'\\'+each_file+'_clean.ms2']
         for each_spectra in file_spctra_dict[each_file]:
             try:
-                ms2_visulizer(ms2_info_dict,each_spectra,each_pep,'D:/data/Mankin/Shura_Ribo_2020/2020_01_24_ms2/ctrl/'
+                ms2_visulizer(ms2_info_dict,each_spectra,each_pep,'D:/data/Mankin/Shura_Ribo_2020/2020_01_24_ms2/api05/'
                               ,'_'.join(each_file.split('_')[-2:]))
             except ValueError:
                 except_peptides[each_pep].append((each_file,each_spectra))
