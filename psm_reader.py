@@ -87,9 +87,12 @@ def peptide_file_spectra_generator(psm_tsv:str):
             pep_seq = line_split[1]
             file_name = line_split[0].split('.')[0]
             spectra_number = int(line_split[0].split('.')[-2])
-            info_dict[pep_seq].append((file_name,spectra_number))
+            pep_seq_mod = pep_seq if line_split[2] == '' else line_split[2]
+            info_dict[pep_seq].append((file_name,spectra_number,pep_seq_mod))
 
     return info_dict
+
+
 def dta_info_reader(dta_file):
 
     info_list = [] # list of tuple
