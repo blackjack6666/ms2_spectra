@@ -45,7 +45,7 @@ for each in protein_dict:
 """
 from tsv_reader import venn_diagram_gen
 import matplotlib.pyplot as plt
-path = 'D:/data/Mankin/images_50_aa_db/apis_control_extended_psm_summary.xlsx'
+path = 'D:/data/Mankin/3_3_db_images_sheets/apis_control_extended_psm_summary_3_3.xlsx'
 
 df = pd.read_excel(path)
 df_api05 = df[df['file_name'].str.contains("api05")]
@@ -55,6 +55,8 @@ df_ctrl = df[df['file_name'].str.contains("ctrl")]
 df_apis = df[df['file_name'].str.contains("api")]
 
 
+"""
+
 
 uniport_api05,uniport_api1,uniport_api4,uniport_control = \
     df_api05['uniprot_id'].tolist(), df_api1['uniprot_id'].tolist(),df_api4['uniprot_id'].tolist(),df_ctrl['uniprot_id'].tolist()
@@ -62,9 +64,9 @@ uniport_api05,uniport_api1,uniport_api4,uniport_control = \
 
 uniprot_apis = uniport_api05+uniport_api1+uniport_api4
 
-venn_diagram_gen({'Apis':uniprot_apis, 'ctrl':uniport_control},
-                 title='Proteins identified by extended peptides in Apis vs ctrl')
-
+venn_diagram_gen({'Api4':uniport_api4, 'ctrl':uniport_control},
+                 title='Proteins identified by extended peptides in Api4 vs ctrl')
+"""
 
 """
 df_apis_normal_count, df_apis_forward_count,df_apis_backward_count = \
