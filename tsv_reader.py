@@ -105,6 +105,29 @@ def psm_reader(psm_path):
             ret_pep_dict[retention_time] = pep_seq
     return pep_spec_count_dict, ret_pep_dict
 
+
+def peptide_charge_getter(peptide_tsv_file:str):
+    """
+    -----
+    get charge for each peptide sequence
+    -----
+    :param tsv_path:
+    :return:
+    """
+    peptide_charge_dict = defaultdict(list)
+    with open(peptide_tsv_file, 'r') as file_open:
+        next(file_open)
+        for line in file_open:
+            line_split = line.split("\t")
+            peptide_seq = line_split[0]
+            charge = line_split[2]
+            if ',' in charge:
+                peptide_charge_dict[peptide_seq].append(int(charge.split(',')[0]))
+                peptide_charge_dict[peptide_seq].append(int(charge.split(',')[1]))
+            else:
+                peptide_charge_dict[peptide_seq].append(int(charge))
+    return peptide_charge_dict
+
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     from matplotlib_venn import venn3, venn3_circles
