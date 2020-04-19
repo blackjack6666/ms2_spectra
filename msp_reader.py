@@ -4,20 +4,24 @@ read msp file from prosit for ms2 visualization
 import matplotlib.pyplot as plt
 import spectrum_utils.plot as sup
 import spectrum_utils.spectrum as sus
-from tsv_reader import peptide_charge_getter, peptide_counting
+from tsv_reader import peptide_charge_getter, peptide_counting, dta_charge_reader
 
 
-def prosit_csv_output(extended_pep_list, pep_tsv_path,output_path):
+def prosit_csv_output(extended_pep_list,output_path,peptide_file_path):
     """
     -----
     output a csv file to prosit peptide prediction
     -----
     :param extended_pep_list:
     :param pep_tsv_path:
+    :param peptide_file_path:could be peptide.tsv or .dta
     :return:
     """
     import pandas as pd
-    peptide_charge_dict = peptide_charge_getter(pep_tsv_path)
+    if peptide_file_path.endswith('.tsv'):
+        peptide_charge_dict = peptide_charge_getter(peptide_file_path)
+    else:
+        peptide_charge_dict = dta_charge_reader(peptide_file_path)
     peptide_charge_list = [[each, 30, charge] for each in extended_pep_list for charge in
                            peptide_charge_dict[each]]
 
