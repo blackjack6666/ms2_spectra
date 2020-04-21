@@ -93,6 +93,80 @@ def peptide_file_spectra_generator(psm_tsv:str):
     return info_dict
 
 
+def dta_file_spectra_generator(file_location_path:str):
+    """
+    -----
+    get peptide-file-spectra-infomation from dta files
+    -----
+    :param dta_file_location:
+    :return:
+    """
+    from glob import glob
+    from collections import defaultdict
+
+    dta_files = []
+
+    # single dta read
+    if isinstance(file_location_path, str) and file_location_path.endswith('.dta'):
+        dta_files = [file_location_path]
+        print('reading single dta file')
+
+    # dta folder read
+    elif isinstance(file_location_path, str) and not file_location_path.endswith('.dta'):
+        dta_files = glob(file_location_path + '*.dta')
+        print('reading single folder')
+
+    # multiple dta files read or multiple dta folder read
+    elif isinstance(file_location_path, list):
+        for each_dta in file_location_path:
+            # when parameter is dta file
+
+            if each_dta.endswith('.dta'):
+                dta_files.append(each_dta)
+
+            # when parameter is a folder path
+            else:
+                dta_files += glob(each_dta + '*.dta')
+    else:
+        raise ValueError('parameter should be string folder path or dta file path or list of dta files or folder paths')
+
+    # exclude wash and hela files
+    clean_dta_files = []
+    for each in dta_files:
+        wash_hela = 0
+        for word in ['wash', 'Wash', 'WASH', 'Hela', 'hela', 'HELA']:
+            if word in each:
+                wash_hela += 1
+                break
+        if wash_hela == 0:
+            clean_dta_files.append(each)
+
+    print(clean_dta_files)
+
+    # read info.
+
+    info_dict = defaultdict(list)
+    for dta_file in clean_dta_files:
+        with open(dta_file, 'r') as file_open:
+            for i in range(29):
+                next(file_open)
+            Reverse_start = 0
+            for line in file_open:
+                line_split = line.split('\t')
+                if line.startswith('Reverse_') or line.startswith('Rev_'):
+                    Reverse_start = 1
+                elif line.startswith('sp') or line.startswith('tr'):
+                    Reverse_start = 0
+
+                elif len(line_split) == 15 and Reverse_start == 0:
+                    pep_seq = line_split[-1].split('.')[1]
+                    file_name = line_split[1].split('.')[0]
+                    spectra_number = int(line_split[1].split('.')[-2])
+                    pep_seq_mod = pep_seq
+                    info_dict[pep_seq].append((file_name,spectra_number,pep_seq_mod))
+
+    return info_dict
+
 def dta_info_reader(dta_file):
 
     info_list = [] # list of tuple
@@ -158,7 +232,3 @@ def psm_compare(psm_path1,psm_path2,target_peptide):
     return same_spectrum_count
 
 
-psm_path1 = 'D:/data/Mankin/search_result/20200129_merged_gln_tyr/ctrl/psm.tsv'
-psm_path2 = 'D:/data/Mankin/search_result/20200129_noextension_databs/ctrl/psm.tsv'
-target_peptide = 'NVVVVYR'
-psm_compare(psm_path1,psm_path2,target_peptide)
