@@ -9,6 +9,6 @@ def ms_cleaner(ms2_file_name):
 
 if __name__ == '__main__':
     from glob import glob
-    file_list = glob('D:/data/Mankin/Shura_Ribo_2020/2020_01_24_ms2/ctrl_ms2/'+'*.ms2')
+    file_list = glob('C:/uic/lab/mankin/dta_results/XS_Shura_High_pH_Frac22_api1_6.ms2')
     for each in file_list:
         ms_cleaner(each)
