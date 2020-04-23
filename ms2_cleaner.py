@@ -9,7 +9,7 @@ def ms_cleaner(ms2_file_name):
 
 if __name__ == '__main__':
     from glob import glob
-    file_list = glob('C:/uic/lab/mankin/ms2_files/api_ms2/'+'*.ms2')
+    file_list = glob('C:/uic/lab/Irina/2020-03-12/'+'*.ms2')
     for each in file_list:
         ms_cleaner(each)
         print (each)

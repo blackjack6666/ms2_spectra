@@ -27,10 +27,9 @@ def ms2_info_reader(ms2_path:str):
 if __name__=='__main__':
     from glob import glob
     import pickle as ppp
-    ms2_path = 'C:/uic/lab/mankin/ms2_files/api_ms2/api4/'
+    ms2_path = 'C:/uic/lab/Irina/2020-03-12/'
     ms2_list = glob(ms2_path+'*_clean.ms2')
     print (ms2_list)
-    """
+
     ms2_dict_of_dict = {each:ms2_info_reader(each) for each in ms2_list}
-    ppp.dump(ms2_dict_of_dict,open('C:/uic/lab/mankin/ms2_files/api_ms2/api4/api4_ms2_dict_of_dict.p', 'wb'))
-    """
+    ppp.dump(ms2_dict_of_dict,open('C:/uic/lab/Irina/2020-03-12/sorf_file_ms2_info_dict_4_23.p', 'wb'))

@@ -71,8 +71,8 @@ from collections import defaultdict
 from glob import glob
 
 
-control_pep_list = ppp.load(open('C:/uic/lab/mankin/dta_results/ext_20aa_stop_dta/20aa_incorp_flie_pep_list_dict.p','rb'))['ctrl']
-ms2_info_dict_of_dict = ppp.load(open('C:/uic/lab/mankin/ms2_files/api_ms2/ctrl/ctrl_ms2_dict_of_dict.p','rb'))
+control_pep_list = ppp.load(open('C:/uic/lab/Irina/sorf_dta_updated_db/sorf_pep_list_4_23.p','rb'))
+ms2_info_dict_of_dict = ppp.load(open('C:/uic/lab/Irina/2020-03-12/sorf_file_ms2_info_dict_4_23.p','rb'))
 
 print ([key for key in ms2_info_dict_of_dict])
 
@@ -80,7 +80,7 @@ print ([key for key in ms2_info_dict_of_dict])
 #psm_path = 'D:/data/Mankin/search_result/20200129_merged_gln_tyr/ctrl/psm.tsv'
 #peptides_info_dict = peptide_file_spectra_generator(psm_path)
 
-dta_path = 'C:/uic/lab/mankin/dta_results/ext_20aa_stop_dta/ctrl/'
+dta_path = 'C:/uic/lab/Irina/sorf_dta_updated_db/'
 peptides_info_dict = dta_file_spectra_generator(dta_path)
 
 
@@ -92,19 +92,19 @@ for each_pep in list(set(control_pep_list)):
     #peptide_seq=peptides_info_dict[each_pep][0][2]
     file_spctra_dict = defaultdict(list)
     pep_spectra_dict = defaultdict(list)
-    for each in peptides_info_dict[each_pep.split('_')[0]]:
+    for each in peptides_info_dict[each_pep]:
         file_spctra_dict[each[0]].append(each[1])
         pep_spectra_dict[each[0]+str(each[1])]=each[2]
 
     for each_file in file_spctra_dict:
         print (each_file)
-        ms2_info_dict = ms2_info_dict_of_dict['C:/uic/lab/mankin/ms2_files/api_ms2/ctrl'+'\\'+each_file+'_clean.ms2']
+        ms2_info_dict = ms2_info_dict_of_dict['C:/uic/lab/Irina/2020-03-12'+'\\'+each_file+'_clean.ms2']
         for each_spectra in file_spctra_dict[each_file]:
             print (each_spectra)
             peptide_seq=pep_spectra_dict[each_file+str(each_spectra)]  # peptide with mod
             try:
-                ms2_visulizer(ms2_info_dict,each_spectra,each_pep.split('_')[0],'C:/uic/lab/mankin/dta_results/ext_20aa_stop_dta/aa_stop_spectrums/ctrl/'
-                            ,'_'.join(each_file.split('_')[-2:]), each_pep)
+                ms2_visulizer(ms2_info_dict,each_spectra,each_pep,'C:/uic/lab/Irina/sorf_dta_updated_db/sorf_ms2_spec/'
+                            ,'_'.join(each_file.split('_')[-2:]), peptide_seq)
             except ValueError:
                 except_peptides[each_pep].append((each_file,each_spectra))
     total_len+=1
