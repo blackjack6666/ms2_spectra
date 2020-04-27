@@ -108,10 +108,12 @@ if __name__=='__main__':
     """
     tsv_path = 'C:/uic/lab/Irina/search_3_22_sorf/T/peptide.tsv'
     pep_list = peptide_counting(tsv_path)
-    prosit_csv_output(pep_list,tsv_path,'C:/uic/lab/Irina/search_3_22_sorf/prosit.csv')
+    peptide = ['TSYSEFLSQLANQYASCLKGDG']
+    dta_path = 'C:/uic/lab/mankin/dta_results/dta_242_20aa_normal_fs/api05/'
+    prosit_csv_output(peptide,'C:/uic/lab/mankin/dta_results/new.csv',dta_path)
     """
 
-    info_dict = msp_reader('C:/uic/lab/Irina/search_3_22_sorf/sorf_msp.msp')
+    info_dict = msp_reader('C:/uic/lab/mankin/dta_results/myPrositLib.msp')
 
 
-    ms2_visulizer(info_dict,'C:/uic/lab/Irina/search_3_22_sorf/ctrl_predicted_spectrum/','ctrl')
+    ms2_visulizer(info_dict,'C:/uic/lab/mankin/dta_results/','api05')
