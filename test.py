@@ -71,8 +71,8 @@ from collections import defaultdict
 from glob import glob
 
 
-control_pep_list = ppp.load(open('C:/uic/lab/mankin/dta_results/dta_242_20aa_normal_fs/20aa_normal_fs_incorp_flie_pep_list_dict.p','rb'))['ctrl']
-ms2_info_dict_of_dict = ppp.load(open('C:/uic/lab/mankin/ms2_files/api_ms2/ctrl/ctrl_ms2_dict_of_dict.p','rb'))
+control_pep_list = ppp.load(open('C:/uic/lab/mankin/dta_results/dta_242_4_29/20aa_normal_fs_incorp_flie_pep_list_dict_4_29.p','rb'))['api4']
+ms2_info_dict_of_dict = ppp.load(open('C:/uic/lab/mankin/ms2_files/api_ms2/api4/api4_ms2_dict_of_dict.p','rb'))
 
 print ([key for key in ms2_info_dict_of_dict])
 
@@ -80,7 +80,7 @@ print ([key for key in ms2_info_dict_of_dict])
 #psm_path = 'D:/data/Mankin/search_result/20200129_merged_gln_tyr/ctrl/psm.tsv'
 #peptides_info_dict = peptide_file_spectra_generator(psm_path)
 
-dta_path = 'C:/uic/lab/mankin/dta_results/dta_242_20aa_normal_fs/ctrl/'
+dta_path = 'C:/uic/lab/mankin/dta_results/dta_242_4_29/api4/'
 peptides_info_dict = dta_file_spectra_generator(dta_path)
 
 
@@ -98,12 +98,12 @@ for each_pep in list(set(control_pep_list)):
 
     for each_file in file_spctra_dict:
         print (each_file)
-        ms2_info_dict = ms2_info_dict_of_dict['C:/uic/lab/mankin/ms2_files/api_ms2/ctrl'+'\\'+each_file+'_clean.ms2']
+        ms2_info_dict = ms2_info_dict_of_dict['C:/uic/lab/mankin/ms2_files/api_ms2/api4'+'\\'+each_file+'_clean.ms2']
         for each_spectra in file_spctra_dict[each_file]:
             print (each_spectra)
             peptide_seq=pep_spectra_dict[each_file+str(each_spectra)]  # peptide with mod
             try:
-                ms2_visulizer(ms2_info_dict,each_spectra,each_pep.split('_')[0],'C:/uic/lab/mankin/dta_results/dta_242_20aa_normal_fs/aa_stop_spectrum/ctrl/'
+                ms2_visulizer(ms2_info_dict,each_spectra,each_pep.split('_')[0],'C:/uic/lab/mankin/dta_results/dta_242_4_29/aa_stop_spectrum/api4/'
                             ,'_'.join(each_file.split('_')[-2:]), each_pep)
             except ValueError:
                 except_peptides[each_pep].append((each_file,each_spectra))
