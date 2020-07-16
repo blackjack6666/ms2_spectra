@@ -20,11 +20,12 @@ def prosit_csv_output(extended_pep_list,output_path,peptide_file_path):
     import pandas as pd
     if peptide_file_path.endswith('.tsv'):
         peptide_charge_dict = peptide_charge_getter(peptide_file_path)
+
     else:
         peptide_charge_dict = dta_charge_reader(peptide_file_path)
     peptide_charge_list = [[each, 30, charge] for each in extended_pep_list for charge in
                            peptide_charge_dict[each]]
-
+    #print (peptide_charge_list)
     df = pd.DataFrame(peptide_charge_list,
                       columns=['modified_sequence', 'collision_energy', 'precursor_charge'])
     df = df.set_index('modified_sequence')
