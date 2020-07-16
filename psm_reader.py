@@ -35,6 +35,36 @@ def peptide_file_spectra_dict(psm_tsv:str):
             info_dict[pep_seq].append((file_name,spectra_number))
     return info_dict
 
+
+def peptide_file_spec_dict_of_dict(psm_tsv:str):
+    """
+    {pep1:{file1:[spec1,spec2], file2:[spec1,spec2]}, pep2:{}}
+    :param psm_tsv:
+    :return:
+    """
+    from collections import defaultdict
+    info_dict = defaultdict(list)
+
+    with open(psm_tsv, 'r') as f:
+        for i in range(1):
+            next(f)
+        for line in f:
+            line_split = line.split('\t')
+            pep_seq = line_split[1]
+            spectra_number = int(line_split[0].split('.')[-2])
+            file_name = line_split[0].split('.')[0]
+            info_dict[pep_seq].append((file_name,spectra_number))
+
+    new_info_dict = {}  # dictionary structure change
+    for each in info_dict:
+        file_spec_list_dict = defaultdict(list)
+        for each_tuple in info_dict[each]:
+            file_spec_list_dict[each_tuple[0]].append(each_tuple[1])
+        new_info_dict[each] = file_spec_list_dict
+
+    return new_info_dict
+
+
 def  spectra_info_generator(psm_tsv):
     """
     read psm line by line, file_spectra as key, the rest as value
@@ -232,3 +262,6 @@ def psm_compare(psm_path1,psm_path2,target_peptide):
     return same_spectrum_count
 
 
+if __name__== "__main__":
+    psm_path = 'D:/data/ext_evo_pj/gb_ref_search_7_7_PXD001723/psm.tsv'
+    print (peptide_file_spec_dict_of_dict(psm_path))
