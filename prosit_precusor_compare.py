@@ -129,6 +129,8 @@ def ms2_info_dict_generator(psm_tsv_path, target_pep_list, ms2_path, pickle_save
 if __name__=='__main__':
     msp_file_path = 'D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001364/myPrositLib.msp'
     msp_info_dict = msp_info_dict_gen(msp_file_path)
+    print([i for i in zip(*msp_info_dict['NVIFLNK'][0])])
+
 
     peptide_list = ppp.load(
         open('C:/Users/gao lab computer/PycharmProjects/extend_different_species/PXD001364_ext_pep_list.p',
@@ -137,13 +139,14 @@ if __name__=='__main__':
     print (len(peptide_list))
 
     ms2_dict_of_dict = ppp.load(open('D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001364/PXD001364_ms2_dict_of_dict_7_13.p','rb'))
+    print ([i for i in zip(*ms2_dict_of_dict['F:/XS/c_elegans/PXD001364'+'\\20091003_Velos4_DiWa_SA_Celegans_HSF1-Day1-1-Offgel05_clean.ms2'][19215][5:7])])
 
-    psm_path = 'D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001364/psm.tsv'
-    target_pep_file_spec_dict_of_dict = target_pep_files_spectra_gen(peptide_list,psm_path)
-
-    print (target_pep_file_spec_dict_of_dict)
-    cosine_score_dict = cosine_similarity_compare(msp_info_dict,target_pep_file_spec_dict_of_dict,ms2_dict_of_dict)
-    print (len(cosine_score_dict))
-
-    high_conf_ext_pep_list = [(pep,each_tu[0],each_tu[1]) for pep in cosine_score_dict for each_tu in cosine_score_dict[pep] if each_tu[1]>0.5]
-    print (high_conf_ext_pep_list)
+    # psm_path = 'D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001364/psm.tsv'
+    # target_pep_file_spec_dict_of_dict = target_pep_files_spectra_gen(peptide_list,psm_path)
+    #
+    # print (target_pep_file_spec_dict_of_dict)
+    # cosine_score_dict = cosine_similarity_compare(msp_info_dict,target_pep_file_spec_dict_of_dict,ms2_dict_of_dict)
+    # print (len(cosine_score_dict))
+    #
+    # high_conf_ext_pep_list = [(pep,each_tu[0],each_tu[1]) for pep in cosine_score_dict for each_tu in cosine_score_dict[pep] if each_tu[1]>0.5]
+    # print (high_conf_ext_pep_list)
