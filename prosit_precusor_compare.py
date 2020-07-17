@@ -1,3 +1,9 @@
+"""
+usage: 1. use prosit_csv_input to generate a csv file for your interested peptides subject to prosit ms2 spectra predict
+       2. follow the steps at the end of this script
+"""
+
+
 from msp_reader import msp_reader, prosit_csv_output
 from ms2_reader import target_peptide_file_spec_getter, target_ms2_info_reader
 from psm_reader import peptide_file_spec_dict_of_dict
@@ -8,14 +14,13 @@ from scipy import spatial
 import pickle as ppp
 
 
-
 def prosit_csv_input(pep_file,csv_out,peptide_list):
     """
     write peptide seq and charge info into a csv file subject to prosit predict
-    :param pep_file:
+    :param pep_file: could be tsv or dta file
     :param csv_out:
     :param peptide_list:
-    :return: csv file
+    :return: csv file for prosit prediction
     """
     prosit_csv = prosit_csv_output(peptide_list,csv_out,pep_file) # output csv file subject to prosit prediction
     return prosit_csv
@@ -38,10 +43,15 @@ def msp_info_dict_gen(msp_file_path):
 
 
 def target_pep_files_spectra_gen(peptide_list,psm_path):
-    # target peptides file and spectra info
+    """
+    get a dictionary of target peptides with file and spectras
+    :param peptide_list:
+    :param psm_path:
+    :return: dict of dict
+    """
 
     pep_file_spec_dict_of_dict = peptide_file_spec_dict_of_dict(psm_path)
-    #print ('1')
+
     target_pep_file_spec_dict_of_dict = {each:pep_file_spec_dict_of_dict[each] for each in peptide_list}
     return target_pep_file_spec_dict_of_dict
 
@@ -84,8 +94,10 @@ def cosine_similarity_compare(new_prosit_info_dict, target_pep_file_spec_dict_of
                     cos_sim = 1-spatial.distance.cosine(v1,v2)
                     print (cos_sim)
                     cos_sim_score_dict[each_pep].append((each_file+'_'+str(each_spec),cos_sim))
-    print (cos_sim_score_dict)
+    #print (cos_sim_score_dict)
     return cos_sim_score_dict
+
+
 def ms2_info_dict_generator(psm_tsv_path, target_pep_list, ms2_path, pickle_saved_path = None):
     """
     write ms2 info of target peptides in a dictionary of dictionary, {file:{spec1:(),spec2(),...}}
@@ -112,6 +124,7 @@ def ms2_info_dict_generator(psm_tsv_path, target_pep_list, ms2_path, pickle_save
         ppp.dump(ms2_dict_of_dict,open(pickle_saved_path,'wb'))
 
     return ms2_dict_of_dict
+
 
 if __name__=='__main__':
     msp_file_path = 'D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001723/myPrositLib.msp'
