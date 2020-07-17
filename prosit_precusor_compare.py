@@ -83,7 +83,7 @@ def cosine_similarity_compare(new_prosit_info_dict, target_pep_file_spec_dict_of
             for each_file in file_spec_list_dict:
                 for each_spec in file_spec_list_dict[each_file]:
                     print (each_file,each_spec)
-                    precusor_mz_array, precusor_int_array = ms2_dict_of_dict['F:/XS/c_elegans/PXD001723'+'\\'+each_file+'_clean.ms2'][each_spec][-2:]
+                    precusor_mz_array, precusor_int_array = ms2_dict_of_dict['F:/XS/c_elegans/PXD001364'+'\\'+each_file+'_clean.ms2'][each_spec][-2:]
                     max_int = max(precusor_int_array)
                     # normalize the intensity array to be compatible with prosit result
                     precusor_int_array = [float(each)/max_int for each in precusor_int_array]
@@ -127,18 +127,18 @@ def ms2_info_dict_generator(psm_tsv_path, target_pep_list, ms2_path, pickle_save
 
 
 if __name__=='__main__':
-    msp_file_path = 'D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001723/myPrositLib.msp'
+    msp_file_path = 'D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001364/myPrositLib.msp'
     msp_info_dict = msp_info_dict_gen(msp_file_path)
 
     peptide_list = ppp.load(
-        open('C:/Users/gao lab computer/PycharmProjects/extend_different_species/PXD001723_ext_pep_list.p',
+        open('C:/Users/gao lab computer/PycharmProjects/extend_different_species/PXD001364_ext_pep_list.p',
              'rb'))  # target peptide list
     peptide_list = [each for each in peptide_list if len(each) <= 30] # peptides longer than 30aa are not compatible with prosit
     print (len(peptide_list))
 
-    ms2_dict_of_dict = ppp.load(open('D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001723/PXD001723_ms2_dict_of_dict_7_13.p','rb'))
+    ms2_dict_of_dict = ppp.load(open('D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001364/PXD001364_ms2_dict_of_dict_7_13.p','rb'))
 
-    psm_path = 'D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001723/psm.tsv'
+    psm_path = 'D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001364/psm.tsv'
     target_pep_file_spec_dict_of_dict = target_pep_files_spectra_gen(peptide_list,psm_path)
 
     print (target_pep_file_spec_dict_of_dict)

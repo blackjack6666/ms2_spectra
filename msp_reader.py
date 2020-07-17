@@ -106,15 +106,18 @@ def ms2_visulizer(msp_info_dict:dict, saved_file_path:str, input_file:str):
 
 
 if __name__=='__main__':
-    """
-    tsv_path = 'C:/uic/lab/Irina/search_3_22_sorf/T/peptide.tsv'
-    pep_list = peptide_counting(tsv_path)
-    peptide = ['TSYSEFLSQLANQYASCLKGDG']
-    dta_path = 'C:/uic/lab/mankin/dta_results/dta_242_20aa_normal_fs/api05/'
-    prosit_csv_output(peptide,'C:/uic/lab/mankin/dta_results/new.csv',dta_path)
-    """
+    import pickle as ppp
+    tsv_path = 'D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001364/peptide.tsv'
+    #pep_list = peptide_counting(tsv_path)
+    #peptide = ['TSYSEFLSQLANQYASCLKGDG']
+    #dta_path = 'C:/uic/lab/mankin/dta_results/dta_242_20aa_normal_fs/api05/'
+    pep_list = ppp.load(open('C:/Users/gao lab computer/PycharmProjects/extend_different_species/PXD001364_ext_pep_list.p','rb'))
+    pep_list = [each for each in pep_list if len(each)<=30]
+    prosit_csv_output(pep_list,'D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001364/prosit_ext.csv',tsv_path)
 
+    """
     info_dict = msp_reader('C:/uic/lab/mankin/dta_results/myPrositLib.msp')
 
 
     ms2_visulizer(info_dict,'C:/uic/lab/mankin/dta_results/','api05')
+    """
