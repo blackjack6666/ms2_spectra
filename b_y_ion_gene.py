@@ -87,6 +87,7 @@ if __name__=='__main__':
 
     b_y_ion_monotonic_bins = sorted([each for each_tp in b_y_ion_clean_list for each in each_tp])
     print (b_y_ion_monotonic_bins)
+    print (len(b_y_ion_monotonic_bins))
     test_array = np.array([147.11281, 115.0502, 261.15573, 214.11862, 374.2398, 327.20267, 521.3082, 261.15775, 474.2711, 237.63919, 634.3923, 317.69977, 733.4607])
     int_array = [0.11995926, 0.00087668106, 0.64565444, 0.48343208, 0.45107266, 0.08600334, 0.7407538, 0.009013158, 0.008180862, 0.00033641688, 1.0, 0.0143297, 0.042357314]
     # print (int_array)
@@ -94,12 +95,13 @@ if __name__=='__main__':
     print (bin_index)
     v1 = np.zeros(len(b_y_ion_monotonic_bins))
     for ind,val in enumerate(bin_index):
-        if val%2 == 0:
-            continue
-        else:
-            print (ind,val)
-            v1[val-1] += int_array[ind]
+        # if val%2 == 0:
+        #     continue
+        # else:
+        print (ind,val)
+        v1[val] += int_array[ind]
     print (v1)
-
+    v1 = [v1[i] for i in range(1,len(v1),2)]
+    print (v1)
 
 
