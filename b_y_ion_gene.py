@@ -97,6 +97,7 @@ if __name__=='__main__':
         if val%2 == 0:
             continue
         else:
+            print (ind,val)
             v1[val-1] += int_array[ind]
     print (v1)
 

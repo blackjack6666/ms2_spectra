@@ -137,6 +137,7 @@ if __name__=='__main__':
     print (b_y_bins)
     mass_array,int_array = msp_info_dict['NVIFLNK'][0]
     print (mass_array)
+    print (int_array)
     bin_index = b_y_ion_gene.dump_mass_into_ion_bins(mass_array,b_y_bins)
     print (bin_index)
     v_predicted = b_y_ion_gene.vector_gen(int_array,bin_index,ion_list)
