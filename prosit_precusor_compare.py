@@ -127,19 +127,30 @@ def ms2_info_dict_generator(psm_tsv_path, target_pep_list, ms2_path, pickle_save
 
 
 if __name__=='__main__':
+    import b_y_ion_gene
     msp_file_path = 'D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001364/myPrositLib.msp'
     msp_info_dict = msp_info_dict_gen(msp_file_path)
     print([i for i in zip(*msp_info_dict['NVIFLNK'][0])])
+    # b/y compare
+    ion_list = b_y_ion_gene.b_y_ion_gen('NVIFLNK')
+    b_y_bins = b_y_ion_gene.b_y_ion_bins_gen(ion_list,ppm=100)
+    print (b_y_bins)
+    mass_array,int_array = msp_info_dict['NVIFLNK'][0]
+    print (mass_array)
+    bin_index = b_y_ion_gene.dump_mass_into_ion_bins(mass_array,b_y_bins)
+    print (bin_index)
+    v_predicted = b_y_ion_gene.vector_gen(int_array,bin_index,ion_list)
+    print (v_predicted)
 
 
-    peptide_list = ppp.load(
-        open('C:/Users/gao lab computer/PycharmProjects/extend_different_species/PXD001364_ext_pep_list.p',
-             'rb'))  # target peptide list
-    peptide_list = [each for each in peptide_list if len(each) <= 30] # peptides longer than 30aa are not compatible with prosit
-    print (len(peptide_list))
-
-    ms2_dict_of_dict = ppp.load(open('D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001364/PXD001364_ms2_dict_of_dict_7_13.p','rb'))
-    print ([i for i in zip(*ms2_dict_of_dict['F:/XS/c_elegans/PXD001364'+'\\20091003_Velos4_DiWa_SA_Celegans_HSF1-Day1-1-Offgel05_clean.ms2'][19215][5:7])])
+    # peptide_list = ppp.load(
+    #     open('C:/Users/gao lab computer/PycharmProjects/extend_different_species/PXD001364_ext_pep_list.p',
+    #          'rb'))  # target peptide list
+    # peptide_list = [each for each in peptide_list if len(each) <= 30] # peptides longer than 30aa are not compatible with prosit
+    # print (len(peptide_list))
+    #
+    # ms2_dict_of_dict = ppp.load(open('D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001364/PXD001364_ms2_dict_of_dict_7_13.p','rb'))
+    # print ([i for i in zip(*ms2_dict_of_dict['F:/XS/c_elegans/PXD001364'+'\\20091003_Velos4_DiWa_SA_Celegans_HSF1-Day1-1-Offgel05_clean.ms2'][19215][5:7])])
 
     # psm_path = 'D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001364/psm.tsv'
     # target_pep_file_spec_dict_of_dict = target_pep_files_spectra_gen(peptide_list,psm_path)
