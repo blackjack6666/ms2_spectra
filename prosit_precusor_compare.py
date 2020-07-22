@@ -98,6 +98,42 @@ def cosine_similarity_compare(new_prosit_info_dict, target_pep_file_spec_dict_of
     return cos_sim_score_dict
 
 
+def b_y_ion_cos_sim_compare(new_prosit_info_dict, target_pep_file_spec_dict_of_dict, ms2_dict_of_dict,ppm:int):
+    """
+    calculate cosine sim score in batch mode
+    :param new_prosit_info_dict:
+    :param target_pep_file_spec_dict_of_dict:
+    :param ms2_dict_of_dict:
+    :return: cosine sim dictionary with pep seq as key, a list of tuple as value
+    """
+    from b_y_ion_gene import single_usage
+    cos_sim_score_dict = defaultdict(list)
+    for each_pep in new_prosit_info_dict:
+        print(each_pep)
+
+        # file_spec_list dict {file:[spec1, spec2],}
+        file_spec_list_dict = target_pep_file_spec_dict_of_dict[each_pep]
+
+        # get mass, int array for peptide seq from prosit
+        for each_tuple in new_prosit_info_dict[each_pep]:
+            predicted_mz_array, predicted_int_array = each_tuple
+
+            for each_file in file_spec_list_dict:
+                for each_spec in file_spec_list_dict[each_file]:
+                    print(each_file, each_spec)
+                    precusor_mz_array, precusor_int_array = \
+                    ms2_dict_of_dict['F:/XS/c_elegans/PXD001364' + '\\' + each_file + '_clean.ms2'][each_spec][-2:]
+                    max_int = max(precusor_int_array)
+
+                    # normalize the intensity array to be compatible with prosit result
+                    precusor_int_array = [float(each) / max_int for each in precusor_int_array]
+                    # get b_y_ion binned cosine similarity score
+                    b_y_binned_cos_score = single_usage(each_pep,predicted_mz_array,predicted_int_array,precusor_mz_array,precusor_int_array,ppm)
+
+                    cos_sim_score_dict[each_pep].append((each_file + '_' + str(each_spec), b_y_binned_cos_score))
+    # print (cos_sim_score_dict)
+    return cos_sim_score_dict
+
 def ms2_info_dict_generator(psm_tsv_path, target_pep_list, ms2_path, pickle_saved_path = None):
     """
     write ms2 info of target peptides in a dictionary of dictionary, {file:{spec1:(),spec2(),...}}
@@ -128,44 +164,47 @@ def ms2_info_dict_generator(psm_tsv_path, target_pep_list, ms2_path, pickle_save
 
 if __name__=='__main__':
     import b_y_ion_gene
-    msp_file_path = 'D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001364/myPrositLib.msp'
+    msp_file_path = 'D:/data/ext_evo_pj/c_elegans/gb_ext_search_7_11_PXD001364/myPrositLib.msp'
     msp_info_dict = msp_info_dict_gen(msp_file_path)
-    print('predicted',[i for i in zip(*msp_info_dict['ESTIDETTRYGPI'][0])])
-    # b/y compare
-    ion_list = b_y_ion_gene.b_y_ion_gen('ESTIDETTRYGPI')
-    b_y_bins = b_y_ion_gene.b_y_ion_bins_gen(ion_list,ppm=50)
-    print ('bins',b_y_bins)
-    mass_array,int_array = msp_info_dict['ESTIDETTRYGPI'][0]
-    print ('predicted mass',mass_array)
-    print ('predicted int',int_array)
-    bin_index = b_y_ion_gene.dump_mass_into_ion_bins(mass_array,b_y_bins)
-    print (bin_index)
-    v_predicted = b_y_ion_gene.vector_gen(int_array,bin_index,b_y_bins)
-    print ('predicted vector',v_predicted)
+    # print('predicted',[i for i in zip(*msp_info_dict['ESTIDETTRYGPI'][0])])
+    # # b/y compare
+    # ion_list = b_y_ion_gene.b_y_ion_gen('ESTIDETTRYGPI')
+    # b_y_bins = b_y_ion_gene.b_y_ion_bins_gen(ion_list,ppm=50)
+    # print ('bins',b_y_bins)
+    # mass_array,int_array = msp_info_dict['ESTIDETTRYGPI'][0]
+    # print ('predicted mass',mass_array)
+    # print ('predicted int',int_array)
+    # bin_index = b_y_ion_gene.dump_mass_into_ion_bins(mass_array,b_y_bins)
+    # print (bin_index)
+    # v_predicted = b_y_ion_gene.vector_gen(int_array,bin_index,b_y_bins)
+    # print ('predicted vector',v_predicted)
 
 
     peptide_list = ppp.load(
         open('C:/Users/gao lab computer/PycharmProjects/extend_different_species/PXD001364_ext_pep_list.p',
              'rb'))  # target peptide list
     peptide_list = [each for each in peptide_list if len(each) <= 30] # peptides longer than 30aa are not compatible with prosit
-    #print (len(peptide_list))
+    print (len(peptide_list))
 
-    ms2_dict_of_dict = ppp.load(open('D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001364/PXD001364_ms2_dict_of_dict_7_13.p','rb'))
+    ms2_dict_of_dict = ppp.load(open('D:/data/ext_evo_pj/c_elegans/gb_ext_search_7_11_PXD001364/PXD001364_ms2_dict_of_dict_7_13.p','rb'))
 
     #print ('precursor',[i for i in zip(*ms2_dict_of_dict['F:/XS/c_elegans/PXD001364'+'\\20091013_Velos3_DiWa_SA_Celegans_Hsf1-Day12_Offgel07_clean.ms2'][7473][5:7])])
 
-    prec_mass_array, prec_int_array = ms2_dict_of_dict['F:/XS/c_elegans/PXD001364'+'\\20091013_Velos3_DiWa_SA_Celegans_Hsf1-Day12_Offgel01_clean.ms2'][10159][5:7]
-    max_prec_int = max(prec_int_array)
-    prec_int_array = [float(each)/max_prec_int for each in prec_int_array]
-    print ('precusor', [i for i in zip(*(prec_mass_array,prec_int_array))])
-    prec_bin_index = b_y_ion_gene.dump_mass_into_ion_bins(prec_mass_array,b_y_bins)
-    v_precusor = b_y_ion_gene.vector_gen(prec_int_array,prec_bin_index,b_y_bins)
-    print ('precusor vector',v_precusor)
-    print (1-spatial.distance.cosine(v_predicted,v_precusor))
-    print (b_y_ion_gene.single_usage('ESTIDETTRYGPI',mass_array,int_array,prec_mass_array,prec_int_array,ppm=50))
-    # psm_path = 'D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001364/psm.tsv'
-    # target_pep_file_spec_dict_of_dict = target_pep_files_spectra_gen(peptide_list,psm_path)
-    #
+    # prec_mass_array, prec_int_array = ms2_dict_of_dict['F:/XS/c_elegans/PXD001364'+'\\20091013_Velos3_DiWa_SA_Celegans_Hsf1-Day12_Offgel01_clean.ms2'][10159][5:7]
+    # max_prec_int = max(prec_int_array)
+    # prec_int_array = [float(each)/max_prec_int for each in prec_int_array]
+    # print ('precusor', [i for i in zip(*(prec_mass_array,prec_int_array))])
+    # prec_bin_index = b_y_ion_gene.dump_mass_into_ion_bins(prec_mass_array,b_y_bins)
+    # v_precusor = b_y_ion_gene.vector_gen(prec_int_array,prec_bin_index,b_y_bins)
+    # print ('precusor vector',v_precusor)
+    # print (1-spatial.distance.cosine(v_predicted,v_precusor))
+    # print (b_y_ion_gene.single_usage('ESTIDETTRYGPI',mass_array,int_array,prec_mass_array,prec_int_array,ppm=50))
+
+    psm_path = 'D:/data/ext_evo_pj/c_elegans/gb_ext_search_7_11_PXD001364/psm.tsv'
+    target_pep_file_spec_dict_of_dict = target_pep_files_spectra_gen(peptide_list,psm_path)
+
+    b_y_ion_binned_cos_sim_dict = b_y_ion_cos_sim_compare(msp_info_dict,target_pep_file_spec_dict_of_dict,ms2_dict_of_dict,50)
+    print(len(b_y_ion_binned_cos_sim_dict), b_y_ion_binned_cos_sim_dict)
     # print (target_pep_file_spec_dict_of_dict)
     # cosine_score_dict = cosine_similarity_compare(msp_info_dict,target_pep_file_spec_dict_of_dict,ms2_dict_of_dict)
     # print (len(cosine_score_dict))
