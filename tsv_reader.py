@@ -201,6 +201,24 @@ def dta_charge_reader(file_location_path):
 
     seq_charge_dict = {each:list(set(seq_charge_dict[each])) for each in seq_charge_dict}
     return seq_charge_dict
+
+
+def pep_probability_getter(pep_tsv_path:str):
+    """
+    get peptide probability from tsv file
+    :param pep_tsv_path:
+    :return:
+    """
+    peptide_prob_dict = {}
+    with open(pep_tsv_path, 'r') as file_open:
+        next(file_open)
+        for line in file_open:
+            line_split = line.split("\t")
+            peptide_seq = line_split[0]
+            probability = float(line_split[3])
+            peptide_prob_dict[peptide_seq]=probability
+    return peptide_prob_dict
+
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     from matplotlib_venn import venn3, venn3_circles
