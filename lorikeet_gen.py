@@ -11,7 +11,7 @@ def lorikeet_view_gen(pep_seq,
                       staticmod=None,
                       ):
     """
-
+    html out must be put at the same directory with js scripts needed for specview
     :param pep_seq:
     :param scan_num:
     :param charge:
