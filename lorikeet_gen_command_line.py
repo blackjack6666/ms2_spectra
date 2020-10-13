@@ -238,7 +238,7 @@ def main():
         print ("plotting...")
         lorikeet_view_gen(args)
 
-        print ("If the output html is empty, the most possible reason is html_out path is not same as the js script for "
+        print ("If the output html is empty, the most possible reason is html_out path is not same as the script for "
                "specview, for more infomation, please contact Xinhao Shao, Gao lab at xshao8@uic.edu")
 
     except KeyboardInterrupt:
