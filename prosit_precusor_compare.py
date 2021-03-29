@@ -217,7 +217,9 @@ if __name__=='__main__':
             total+=each_tp[1]
         aver = float(total)/len(b_y_ion_binned_cos_sim_dict[each_pep])
         cosine_average_dict[each_pep]=aver
-    ppp.dump(cosine_average_dict,open('PXD001723_ext_pep_cosScore_dict.p','wb'))
+    print (cosine_average_dict)
+    # plt.hist([v for v in cosine_average_dict.values()])
+    # ppp.dump(cosine_average_dict,open('PXD001723_ext_pep_cosScore_dict.p','wb'))
     # print (target_pep_file_spec_dict_of_dict)
     # cosine_score_dict = cosine_similarity_compare(msp_info_dict,target_pep_file_spec_dict_of_dict,ms2_dict_of_dict)
     # print (len(cosine_score_dict))
