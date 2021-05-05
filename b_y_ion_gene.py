@@ -4,13 +4,14 @@ Calculate the theoritical b and y ions given one peptide sequence
 import numpy as np
 
 
-def b_y_ion_gen(peptide_seq):
+def b_y_ion_gen(peptide_seq_charge):
     """
     generate a list of tuple with b ion and y ion
-    :param peptide_seq:
+    :param peptide_seq_charge: PEPTIDEcharge
     :return:
     """
     from aa_mass_table import aa_mass_table,h_oh_mass_dict
+    peptide_seq = peptide_seq_charge[:-1]
     ion_list = []
     rev_peptide_seq = peptide_seq[::-1]
 

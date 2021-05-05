@@ -49,7 +49,7 @@ def msp_reader(msp_file_path):
             key = each_split[0]
             pep_seq,charge = key.split('/')[0], int(key.split('/')[1])
             m_weight = float(each_split[1].split('MW: ')[1])
-            m_over_z = m_weight/charge
+            m_over_z = m_weight
             mass_array = [float(line.split('\t')[0]) for line in each_split[4:-1]]
             int_array = [float(line.split('\t')[1]) for line in each_split[4:-1]]
             info_dict[key] = (pep_seq,charge,m_weight,m_over_z,mass_array,int_array)
@@ -99,7 +99,7 @@ def ms2_visulizer(msp_info_dict:dict, saved_file_path:str, input_file:str):
         fig, ax = plt.subplots(figsize=(12, 6))
         sup.spectrum(spectrum,grid=False,ax=ax)
         plt.title(str(pep_seq)+' '+input_file+' '+ ' charge: '+str(charge1)+
-                ' precursor mass: '+str(pre_cursor_mass))
+                ' precursor mass: '+str(pre_cursor_mass*charge1))
         plt.savefig(saved_file_path+pep_seq+'_'+str(charge1)+'_'+input_file+'.png')
         #plt.show()
         plt.close()
@@ -107,17 +107,17 @@ def ms2_visulizer(msp_info_dict:dict, saved_file_path:str, input_file:str):
 
 if __name__=='__main__':
     import pickle as ppp
-    tsv_path = 'D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001364/peptide.tsv'
+    tsv_path = 'D:/uic/lab/mankin/20200302_3_2_db_search/api05/peptide.tsv'
     #pep_list = peptide_counting(tsv_path)
     #peptide = ['TSYSEFLSQLANQYASCLKGDG']
     #dta_path = 'C:/uic/lab/mankin/dta_results/dta_242_20aa_normal_fs/api05/'
-    pep_list = ppp.load(open('C:/Users/gao lab computer/PycharmProjects/extend_different_species/PXD001364_ext_pep_list.p','rb'))
-    pep_list = [each for each in pep_list if len(each)<=30]
-    prosit_csv_output(pep_list,'D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001364/prosit_ext.csv',tsv_path)
-
-    """
-    info_dict = msp_reader('C:/uic/lab/mankin/dta_results/myPrositLib.msp')
+    # pep_list = ppp.load(open('C:/Users/gao lab computer/PycharmProjects/extend_different_species/PXD001364_ext_pep_list.p','rb'))
+    # pep_list = [each for each in pep_list if len(each)<=30]
+    # pep_list = ['AEHLVFWNGGR','VPVTDESPATR','WKNPTPSYSK']
+    # prosit_csv_output(pep_list,'D:/uic/lab/mankin/predfull/prosit_test.csv',tsv_path)
 
 
-    ms2_visulizer(info_dict,'C:/uic/lab/mankin/dta_results/','api05')
-    """
+    info_dict = msp_reader('D:/uic/lab/mankin/predfull/myPrositLib.msp')
+
+
+    ms2_visulizer(info_dict,'D:/uic/lab/mankin/predfull/','prosit_predict')

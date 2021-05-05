@@ -51,9 +51,10 @@ def peptide_file_spec_dict_of_dict(psm_tsv:str):
         for line in f:
             line_split = line.split('\t')
             pep_seq = line_split[1]
+            charge = line_split[0].split('.')[-1]
             spectra_number = int(line_split[0].split('.')[-2])
             file_name = line_split[0].split('.')[0]
-            info_dict[pep_seq].append((file_name,spectra_number))
+            info_dict[pep_seq+charge].append((file_name,spectra_number))
 
     new_info_dict = {}  # dictionary structure change
     for each in info_dict:
