@@ -208,7 +208,7 @@ if __name__=='__main__':
     # print (1-spatial.distance.cosine(v_predicted,v_precusor))
     # print (b_y_ion_gene.single_usage('ESTIDETTRYGPI',mass_array,int_array,prec_mass_array,prec_int_array,ppm=50))
 
-    psm_path = 'D:/uic/lab/mankin/20200302_3_2_db_search/api05/psm.tsv'
+    psm_path = 'D:/uic/lab/mankin/20200302_3_2_db_search/api05/psm.tsv'  # one psm file could include multiple file search result
     target_pep_file_spec_dict_of_dict = target_pep_files_spectra_gen(peptide_list,psm_path)
 
     b_y_ion_binned_cos_sim_dict = b_y_ion_cos_sim_compare(msp_info_dict,target_pep_file_spec_dict_of_dict,ms2_dict_of_dict,50)
@@ -216,7 +216,7 @@ if __name__=='__main__':
 
     # caculate avearge cosine score for each pep
     cosine_average_dict = {}
-    for each_pep in b_y_ion_binned_cos_sim_dict:
+    for each_pep in b_y_ion_binned_cos_sim_dict:  # each_pep: peptide_seq + charge
         total = 0
         for each_tp in b_y_ion_binned_cos_sim_dict[each_pep]:
             total+=each_tp[1]

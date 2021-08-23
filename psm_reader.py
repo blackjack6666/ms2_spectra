@@ -83,6 +83,7 @@ def  spectra_info_generator(psm_tsv):
             info_dict[file_spectra_number] = info
     return info_dict
 
+
 def peptide_spectra_dict2(psm_tsv:str):
     """
 
@@ -100,6 +101,8 @@ def peptide_spectra_dict2(psm_tsv:str):
             spectra_number = line_split[0]  # file_name_spectra_number
             info_dict[pep_seq].append(spectra_number)
     return info_dict
+
+
 def peptide_file_spectra_generator(psm_tsv:str):
     """
     get peptide-file-spectra-infomation, for multiple file search together
