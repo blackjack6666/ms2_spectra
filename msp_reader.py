@@ -107,17 +107,17 @@ def ms2_visulizer(msp_info_dict:dict, saved_file_path:str, input_file:str):
 
 if __name__=='__main__':
     import pickle as ppp
-    tsv_path = 'D:/uic/lab/mankin/20200302_3_2_db_search/api05/peptide.tsv'
+    peptsv = 'F:/alanine_tailing/search/open_search/chymo_open_search/Tarpt_HS_chymo/peptide.tsv'
     #pep_list = peptide_counting(tsv_path)
-    #peptide = ['TSYSEFLSQLANQYASCLKGDG']
+    # peptide = ['TSYSEFLSQLANQYASCLKGDG']
     #dta_path = 'C:/uic/lab/mankin/dta_results/dta_242_20aa_normal_fs/api05/'
     # pep_list = ppp.load(open('C:/Users/gao lab computer/PycharmProjects/extend_different_species/PXD001364_ext_pep_list.p','rb'))
     # pep_list = [each for each in pep_list if len(each)<=30]
-    # pep_list = ['AEHLVFWNGGR','VPVTDESPATR','WKNPTPSYSK']
-    # prosit_csv_output(pep_list,'D:/uic/lab/mankin/predfull/prosit_test.csv',tsv_path)
+    # pep_list = ['SHPQFEKAARLMSAAA']
+    # prosit_csv_output(pep_list,'F:/alanine_tailing/SHPQFEKAARLMSAAA.csv',peptsv)
 
 
-    info_dict = msp_reader('D:/uic/lab/mankin/predfull/myPrositLib.msp')
-
-
-    ms2_visulizer(info_dict,'D:/uic/lab/mankin/predfull/','prosit_predict')
+    info_dict = msp_reader('F:/alanine_tailing/prosit/SHPQFEKAARLMSAAA.msp')
+    #
+    #
+    ms2_visulizer(info_dict,'F:/alanine_tailing/prosit/','prosit_predict')

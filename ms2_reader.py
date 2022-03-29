@@ -83,13 +83,16 @@ if __name__=='__main__':
     from glob import glob
     import pickle as ppp
 
-    psm_tsv = 'D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001723/psm.tsv'
+    psm_tsv = 'F:/alanine_tailing/search/open_search/chymo_open_search/Tarpt_HS_chymo/psm.tsv'
 
-    pep_list = ppp.load(open('PXD001723_ext_pep_list.p', 'rb'))
+
+    # pep_list = ppp.load(open('PXD001723_ext_pep_list.p', 'rb'))
+    pep_list = ['SHPQFEKAARLMSAAA']
     # print (pep_list)
-    ms2_path = 'F:/XS/c_elegans/PXD001723/'
-
-    ms2_list = glob(ms2_path + '*_clean.ms2')
+    # ms2_path = 'F:/XS/c_elegans/PXD001723/'
+    #
+    # ms2_list = glob(ms2_path + '*_clean.ms2')
+    ms2_list = glob('F:/alanine_tailing/2022_03_07/*Chymo_clean.ms2')
     file_spec_no_list_dict = target_peptide_file_spec_getter(pep_list, psm_tsv)
     print(file_spec_no_list_dict)
 
@@ -98,4 +101,4 @@ if __name__=='__main__':
         ms2_list}
 
     ppp.dump(ms2_dict_of_dict,
-             open('D:/data/ext_evo_pj/gb_ext_search_7_11_PXD001723/PXD001723_ms2_dict_of_dict_7_13.p', 'wb'))
+             open('F:/alanine_tailing/2022_03_07/SHPQFEKAARLMSAAA_psms.p', 'wb'))

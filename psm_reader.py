@@ -16,7 +16,7 @@ def peptide_spectra_dict(psm_tsv:str):
             info_dict[pep_seq].append(spectra_number)
     return info_dict
 
-def peptide_file_spectra_dict(psm_tsv:str):
+def peptide_file_spectra_dict(psm_tsv:str, fragpipe=15.0):
     """
     get peptide-file-spectra dictionary
     :param psm_tsv:
@@ -29,7 +29,7 @@ def peptide_file_spectra_dict(psm_tsv:str):
             next(f)
         for line in f:
             line_split = line.split('\t')
-            pep_seq = line_split[1]
+            pep_seq = line_split[2] if fragpipe == 15.0 else line_split[1]
             spectra_number = int(line_split[0].split('.')[-2])
             file_name = line_split[0].split('.')[0]
             info_dict[pep_seq].append((file_name,spectra_number))
@@ -103,7 +103,7 @@ def peptide_spectra_dict2(psm_tsv:str):
     return info_dict
 
 
-def peptide_file_spectra_generator(psm_tsv:str):
+def peptide_file_spectra_generator(psm_tsv:str,fragpipe=15.0):
     """
     get peptide-file-spectra-infomation, for multiple file search together
     -----
@@ -118,10 +118,10 @@ def peptide_file_spectra_generator(psm_tsv:str):
             next(f)
         for line in f:
             line_split = line.split('\t')
-            pep_seq = line_split[1]
+            pep_seq = line_split[2] if fragpipe == 15.0 else line_split[1]
             file_name = line_split[0].split('.')[0]
             spectra_number = int(line_split[0].split('.')[-2])
-            pep_seq_mod = pep_seq if line_split[2] == '' else line_split[2]
+            pep_seq_mod = pep_seq if line_split[3] == '' else line_split[3]
             info_dict[pep_seq].append((file_name,spectra_number,pep_seq_mod))
 
     return info_dict

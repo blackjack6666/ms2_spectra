@@ -47,11 +47,11 @@ def mgf_file_reader(mgf_file):
             info_dict[pep_seq+str(charge)] = pep_seq,charge,precusor_mass,m_over_z,mass_array,int_array
     return info_dict
 
-# peptsv = 'D:/uic/lab/mankin/20200302_3_2_db_search/api05/peptide.tsv'
-#
-# peptide_list = ['AEHLVFWNGGR','VPVTDESPATR','WKNPTPSYSK']
-# prosit_csv_output(peptide_list,'D:/uic/lab/mankin/predfull/test.tsv', peptsv)
+peptsv = 'F:/alanine_tailing/search/open_search/chymo_open_search/Tarpt_HS_chymo/peptide.tsv'
 
-mgf_file = 'D:/uic/lab/code/PredFull-master/test_prediction.mgf'
-info_dict = mgf_file_reader(mgf_file)
-ms2_visulizer(info_dict,'D:/uic/lab/mankin/predfull/', 'predfull_predict')
+peptide_list = ['SHPQFEKAARLMSAAA']
+prosit_csv_output(peptide_list,'F:/alanine_tailing/SHPQFEKAARLMSAAA_prosit.tsv', peptsv)
+
+# mgf_file = 'D:/uic/lab/code/PredFull-master/test_prediction.mgf'
+# info_dict = mgf_file_reader(mgf_file)
+# ms2_visulizer(info_dict,'D:/uic/lab/mankin/predfull/', 'predfull_predict')
