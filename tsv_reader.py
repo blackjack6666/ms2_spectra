@@ -2,6 +2,35 @@ import re
 from collections import defaultdict
 import pandas as pd
 
+
+def fasta_reader(fasta_file_path):
+
+    with open(fasta_file_path, 'r') as file_open:
+        file_split = file_open.read().split('\n>')
+
+    return {each.split('\n')[0].split('|')[1]: ''.join(each.split('\n')[1:]) for each in file_split}
+
+
+def read_description(fasta_file):
+    """
+       read description and prefix in fasta file
+       :param fasta_file:
+       :return:
+       """
+
+    # dictionary format: {'ID': ('sp', 'description')}
+    ID_description_dict = {}
+    with open(fasta_file, 'r') as file_open:
+        file_split = file_open.read().split('\n>')
+        # first entry special case
+        ID_description_dict[file_split[0].split('\n')[0].split('|')[1]] = (
+        file_split[0].split('\n')[0].split('|')[0][1:], file_split[0].split('\n')[0].split('|')[2])
+        for each in file_split[1:]:
+            split_line = each.split('\n')
+            ID_description_dict[split_line[0].split('|')[1]] = (
+            split_line[0].split('|')[0], split_line[0].split('|')[2])
+    return ID_description_dict
+
 def protein_tsv_reader(protein_tsv_file):
     protein_list = []
     with open(protein_tsv_file, 'r') as file_open:
@@ -24,6 +53,27 @@ def protein_phospho_counting(protein_csv_file):
                 if ele != '':
                     phospho_protein_dict[protein_ID] = regex
     return phospho_protein_dict
+
+
+def combined_proteintsv_map(combined_protein_tsv):
+    """
+    map spectra count from combined protein tsv file to each file
+    :param combined_protein_tsv:
+    :return:
+    """
+    info_dict = {}
+    import pandas as pd
+    df = pd.read_csv(combined_protein_tsv,sep='\t',index_col=False)
+    # print (df.head)
+    protein_list = df['Protein ID']
+
+    for each_column in df.columns:
+        if 'Total Spectral Count' in each_column:
+            file_name = each_column.split(' ')[0]
+            spec_count_list = df[each_column]
+            protein_spec_dict = {i:j for i,j in zip(protein_list,spec_count_list) if j != 0}
+            info_dict[file_name] = protein_spec_dict
+    return info_dict
 
 
 def info_getter(protein_tsv_file):
