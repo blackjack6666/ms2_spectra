@@ -104,14 +104,14 @@ def single_usage(peptide_seq, predicted_mass_array, predicted_int_array, precurs
     :param precursor_int_array: 1D array, from MS2 spectrum
     :return: cosine similarity for b/y ions binned ms2 between predicted and precursor ms2 spectrum
     """
-    ion_list = b_y_ion_gen(peptide_seq)
-    b_y_ion_bins = b_y_ion_bins_gen(ion_list,ppm=ppm)
+    ion_list = b_y_ion_gen(peptide_seq)  # get theoretical ion mass
+    b_y_ion_bins = b_y_ion_bins_gen(ion_list,ppm=ppm) # get ion mass bin edges
 
-    predicted_bin_index = dump_mass_into_ion_bins(predicted_mass_array,b_y_ion_bins)
-    precusor_bin_index = dump_mass_into_ion_bins(precursor_mass_array,b_y_ion_bins)
+    predicted_bin_index = dump_mass_into_ion_bins(predicted_mass_array,b_y_ion_bins)  # get bin index for each mass
+    precusor_bin_index = dump_mass_into_ion_bins(precursor_mass_array,b_y_ion_bins)  #
 
-    v_predicted = vector_gen(predicted_int_array,predicted_bin_index,b_y_ion_bins)
-    v_precusor = vector_gen(precursor_int_array,precusor_bin_index,b_y_ion_bins)
+    v_predicted = vector_gen(predicted_int_array,predicted_bin_index,b_y_ion_bins) # get binned intensity array
+    v_precusor = vector_gen(precursor_int_array,precusor_bin_index,b_y_ion_bins) # get binned intensity array
 
     return cosine_sim_calculating(v_predicted,v_precusor)
 
