@@ -46,17 +46,40 @@ def msp_reader(msp_file_path):
         f_split = f_open.read().split('Name: ')
         for each in f_split[1:]:
             each_split = each.split('\n')
-            key = each_split[0]
-            pep_seq,charge = key.split('/')[0], int(key.split('/')[1])
+            info_line = each_split[2]
+            print (info_line)
+            pep_seq = info_line.split('ModString=')[1].split('//')[0]
+            charge = int(each_split[0].split('/')[1])
+
+            if 'Oxidation@M' in info_line:  # decide oxidation index
+                pep_seq_moxi = ''
+                oxi_M = info_line.split('Oxidation@M')[1:]
+                if len(oxi_M) == 1:
+                    oxi_m_idx = [int(oxi_M[0].split('/')[0])] if '; ' not in oxi_M[0] else [int(oxi_M[0].split('; ')[0].split('/')[0])]
+                else:
+                    oxi_m_idx = [int(chunk.split('; ')[0]) for chunk in oxi_M[:-1]]
+                    if 'Carbamidomethyl@' not in oxi_M[-1]:
+                        oxi_m_idx.append(int(oxi_M[-1].split('/')[0]))
+                    else:
+                        oxi_m_idx.append(int(oxi_M[-1].split('/')[0].split('; ')[0]))
+                # add M(ox) to original sequence
+                for i, j in enumerate(pep_seq):
+                    if i in oxi_m_idx:
+                        pep_seq_moxi += 'M(ox)'
+                    else:
+                        pep_seq_moxi += j
+            else:
+                pep_seq_moxi = pep_seq
+            print (pep_seq_moxi)
             m_weight = float(each_split[1].split('MW: ')[1])
             m_over_z = m_weight
             mass_array = [float(line.split('\t')[0]) for line in each_split[4:-1]]
             int_array = [float(line.split('\t')[1]) for line in each_split[4:-1]]
-            info_dict[key] = (pep_seq,charge,m_weight,m_over_z,mass_array,int_array)
+            info_dict[pep_seq_moxi+str(charge)] = (pep_seq_moxi,charge,m_weight,m_over_z,mass_array,int_array)
     return info_dict
 
 
-def ms2_visulizer(msp_info_dict:dict, saved_file_path:str, input_file:str):
+def ms2_visulizer(msp_info_dict:dict, saved_file_path:str, input_file:str, target_list=None):
     """
     plot the ms2 peak give spectrum number and peptide sequence
     -----
@@ -64,7 +87,11 @@ def ms2_visulizer(msp_info_dict:dict, saved_file_path:str, input_file:str):
     :return: ms2 peak plot
     """
     import numpy as np
-    for each in msp_info_dict:
+    if target_list == None:
+        target_list = msp_info_dict
+
+
+    for each in target_list:
 
         pep_seq, charge1, pre_cursor_mass, m_over_z, m_array, int_array = msp_info_dict[each]
 
@@ -80,8 +107,8 @@ def ms2_visulizer(msp_info_dict:dict, saved_file_path:str, input_file:str):
         #print(m_array, int_array)
         # Create the MS/MS spectrum.
         spectrum = sus.MsmsSpectrum(
-            'identifier', m_over_z, charge1, m_array, int_array,
-             peptide=pep_seq)
+            'identifier', m_over_z, int(charge1), m_array, int_array,
+             )
 
     # Process the MS/MS spectrum.
         fragment_tol_mass = 50
@@ -105,8 +132,63 @@ def ms2_visulizer(msp_info_dict:dict, saved_file_path:str, input_file:str):
         plt.close()
 
 
+def ms2_visulizer2(msp_info_dict:dict, saved_file_path:str, input_file:str, target_list=None):
+    """
+    plot the ms2 spectram from prosit predicted spectrum
+    -----
+    :param msp_info_dict: spectra_no as key, (mz, ret_time, charge1,charge2, mass_array,intensity arrary) as value
+    :return: ms2 peak plot
+    """
+    import numpy as np
+    if target_list == None:
+        target_list = msp_info_dict
+
+    for each in target_list:
+
+        pep_seq, charge1, precursor_moz, m_over_z, m_array, int_array = msp_info_dict[each]
+        m_array = np.array(m_array, dtype=float)
+        int_array = np.array(int_array,dtype=float)
+        # add one value before and after m_array and int_array to make the range same
+
+        m_array = np.append(m_array,2000)
+        m_array = np.insert(m_array,0,1)
+        int_array = np.append(int_array,np.max(int_array)*0.006)
+        int_array = np.insert(int_array,0,np.max(int_array)*0.006)
+        #print(m_array, int_array)
+        # Create the MS/MS spectrum.
+        test_spec = sus.MsmsSpectrum('identifier', m_over_z, int(charge1), m_array, int_array)
+        pep_seq_1 = pep_seq.replace('M(ox)','M[+15.9949]')
+        test_spec.annotate_proforma(pep_seq_1, fragment_tol_mass=50, fragment_tol_mode="ppm", ion_types="aby")
+
+        fig, ax = plt.subplots(figsize=(12, 8))
+
+        sup.spectrum(test_spec, grid=False, ax=ax)
+
+    # Process the MS/MS spectrum.
+    #     fragment_tol_mass = 50
+    #     fragment_tol_mode = 'ppm'
+    #     try:
+    #         spectrum = (spectrum.set_mz_range(min_mz=None, max_mz=None)
+    #                     .remove_precursor_peak(fragment_tol_mass, fragment_tol_mode)
+    #                     .filter_intensity(min_intensity=0.0005, max_num_peaks=8000)
+    #                     .scale_intensity()
+    #                     .annotate_peptide_fragments(fragment_tol_mass, fragment_tol_mode,
+    #                                     ion_types='by'))
+    #     except ValueError:
+    #         print (each)
+    # Plot the MS/MS spectrum.
+    #     fig, ax = plt.subplots(figsize=(12, 6))
+    #     sup.spectrum(spectrum,grid=False,ax=ax)
+        plt.title(str(pep_seq)+' '+input_file+' '+ ' charge: '+str(charge1)+
+                ' precursor mass: '+str(precursor_moz*charge1))
+        plt.savefig(saved_file_path+pep_seq+'_'+str(charge1)+'_'+input_file+'.png')
+        #plt.show()
+        plt.close()
+
+
 if __name__=='__main__':
     import pickle as ppp
+    import pandas as pd
     peptsv = 'F:/alanine_tailing/search/open_search/chymo_open_search/Tarpt_HS_chymo/peptide.tsv'
     #pep_list = peptide_counting(tsv_path)
     # peptide = ['TSYSEFLSQLANQYASCLKGDG']
@@ -117,7 +199,17 @@ if __name__=='__main__':
     # prosit_csv_output(pep_list,'F:/alanine_tailing/SHPQFEKAARLMSAAA.csv',peptsv)
 
 
-    info_dict = msp_reader('F:/alanine_tailing/prosit/SHPQFEKAARLMSAAA.msp')
+    # info_dict = msp_reader('F:/alanine_tailing/prosit/SHPQFEKAARLMSAAA.msp')
     #
     #
-    ms2_visulizer(info_dict,'F:/alanine_tailing/prosit/','prosit_predict')
+    # ms2_visulizer(info_dict,'F:/alanine_tailing/prosit/','prosit_predict')
+
+    # Colon datasets from Cornell
+    info_dict = msp_reader('F:/Colon/prosit/myPrositLib.msp')
+    cos_sim_df = pd.read_csv('F:/Colon/prosit/cos_sim.csv').sort_values(by=['cos similarity'],ascending=False).iloc[:100,:]
+    psm_charge_list = [psm+str(charge) for psm,charge in zip(cos_sim_df['PSM'],cos_sim_df['charge'])]
+    print (psm_charge_list)
+    #
+    ms2_visulizer2(info_dict, 'F:/Colon/prosit/top100_prosit_spectrum/', 'prosit_predict',target_list=psm_charge_list)
+    # from b_y_ion_gene import b_y_ion_gen
+    # print (b_y_ion_gen('LM(ox)ITAM(ox)RPK3'))

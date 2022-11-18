@@ -125,7 +125,7 @@ def b_y_ion_cos_sim_compare(new_prosit_info_dict, target_pep_file_spec_dict_of_d
                 for each_spec in file_spec_list_dict[each_file]:
                     print(each_file, each_spec)
                     precusor_mz_array, precusor_int_array = \
-                    ms2_dict_of_dict['C:/uic/lab/mankin/ms2_files/api_ms2/api05' + '\\' + each_file + '_clean.ms2'][each_spec][-2:]
+                    ms2_dict_of_dict[each_file][each_spec][-2:]
                     max_int = max(precusor_int_array)
 
                     # normalize the intensity array to be compatible with prosit result
@@ -166,12 +166,13 @@ def ms2_info_dict_generator(psm_tsv_path, target_pep_list, ms2_path, pickle_save
 
 
 if __name__=='__main__':
+    import pandas as pd
     import b_y_ion_gene
     import matplotlib.pyplot as plt
-    from predfull import mgf_file
+    # from predfull import mgf_file
     import pickle as ppp
-    msp_file_path = 'D:/uic/lab/code/PredFull-master/test_prediction.mgf'
-    msp_info_dict = msp_info_dict_gen(msp_file_path, file='mgf')
+    msp_file_path = 'F:/Colon/prosit/myPrositLib.msp'
+    msp_info_dict = msp_info_dict_gen(msp_file_path, file='msp')
 
     # print('predicted',[i for i in zip(*msp_info_dict['ESTIDETTRYGPI'][0])])
     # # b/y compare
@@ -190,11 +191,11 @@ if __name__=='__main__':
     # peptide_list = ppp.load(
     #     open('C:/Users/gao lab computer/PycharmProjects/extend_different_species/PXD001723_ext_pep_list.p',
     #          'rb'))  # target peptide list
-    peptide_list = ['AEHLVFWNGGR2','AEHLVFWNGGR3','VPVTDESPATR2','WKNPTPSYSK2']
-    peptide_list = [each for each in peptide_list if len(each) <= 30] # peptides longer than 30aa are not compatible with prosit
-    print (len(peptide_list))
+    # peptide_list = ['AEHLVFWNGGR2','AEHLVFWNGGR3','VPVTDESPATR2','WKNPTPSYSK2']
+    # peptide_list = [each for each in peptide_list if len(each) <= 30] # peptides longer than 30aa are not compatible with prosit
+    # print (len(peptide_list))
 
-    ms2_dict_of_dict = ppp.load(open('D:/uic/lab/mankin/ms2_files/api_ms2/api05/api05_ms2_dict_of_dict.p','rb'))
+    ms2_dict_of_dict = ppp.load(open('F:/Colon/ms2/ms2_dict_of_dict_target.p','rb'))
 
     #print ('precursor',[i for i in zip(*ms2_dict_of_dict['F:/XS/c_elegans/PXD001364'+'\\20091013_Velos3_DiWa_SA_Celegans_Hsf1-Day12_Offgel07_clean.ms2'][7473][5:7])])
 
@@ -208,21 +209,32 @@ if __name__=='__main__':
     # print (1-spatial.distance.cosine(v_predicted,v_precusor))
     # print (b_y_ion_gene.single_usage('ESTIDETTRYGPI',mass_array,int_array,prec_mass_array,prec_int_array,ppm=50))
 
-    psm_path = 'D:/uic/lab/mankin/20200302_3_2_db_search/api05/psm.tsv'  # one psm file could include multiple file search result
-    target_pep_file_spec_dict_of_dict = target_pep_files_spectra_gen(peptide_list,psm_path)
+    # psm_path = 'D:/uic/lab/mankin/20200302_3_2_db_search/api05/psm.tsv'  # one psm file could include multiple file search result
+    # target_pep_file_spec_dict_of_dict = target_pep_files_spectra_gen(peptide_list,psm_path)
+    target_pep_file_spec_dict_of_dict = ppp.load(open('F:/Colon/prosit/pep_file_spec_dict_of_dict.p','rb'))
 
     b_y_ion_binned_cos_sim_dict = b_y_ion_cos_sim_compare(msp_info_dict,target_pep_file_spec_dict_of_dict,ms2_dict_of_dict,50)
-    print(len(b_y_ion_binned_cos_sim_dict), b_y_ion_binned_cos_sim_dict)
+    # print(len(b_y_ion_binned_cos_sim_dict), b_y_ion_binned_cos_sim_dict)
 
     # caculate avearge cosine score for each pep
-    cosine_average_dict = {}
-    for each_pep in b_y_ion_binned_cos_sim_dict:  # each_pep: peptide_seq + charge
-        total = 0
-        for each_tp in b_y_ion_binned_cos_sim_dict[each_pep]:
-            total+=each_tp[1]
-        aver = float(total)/len(b_y_ion_binned_cos_sim_dict[each_pep])
-        cosine_average_dict[each_pep]=aver
-    print (cosine_average_dict)
+    # cosine_average_dict = {}
+    # for each_pep in b_y_ion_binned_cos_sim_dict:  # each_pep: peptide_seq + charge
+    #     total = 0
+    #     for each_tp in b_y_ion_binned_cos_sim_dict[each_pep]:
+    #         total+=each_tp[1]
+    #     aver = float(total)/len(b_y_ion_binned_cos_sim_dict[each_pep])
+    #     cosine_average_dict[each_pep]=aver
+
+    # output cos similarity into csv
+    data = []
+    for pep in b_y_ion_binned_cos_sim_dict:
+        pep_seq, charge = pep[:-1],int(pep[-1])
+        for each_tp in b_y_ion_binned_cos_sim_dict[pep]:
+            file,spec_no = '_'.join(each_tp[0].split('_')[:-1]), int(each_tp[0].split('_')[-1])
+            cos_sim = each_tp[1]
+            data.append([file, spec_no, pep_seq, charge, cos_sim])
+    pd.DataFrame(data,columns=['file','spec_no','PSM','charge','cos similarity']).to_csv('F:/Colon/prosit/cos_sim.csv')
+
     # plt.hist([v for v in cosine_average_dict.values()])
     # ppp.dump(cosine_average_dict,open('PXD001723_ext_pep_cosScore_dict.p','wb'))
     # print (target_pep_file_spec_dict_of_dict)

@@ -86,4 +86,4 @@ if __name__=="__main__":
                    [736.4392,0.068093434],[782.4303,0.3423374],[867.47974,0.11775447],[895.5144,0.26976636],[980.5638,0.19554809],[1008.59845,0.12986062],[1095.6305,0.7183024],[1111.6042,0.20025733],[1224.6884,0.0836296],
                    [1242.6989,0.4526999]]
 
-    lorikeet_view_gen(seq,scan_num,charge,precusor_mz,filename,mz_2d_array,html_out='C:/Users/gao lab computer/Downloads/UWPR-Lorikeet-d2a4a49/html/test2.html')
+    lorikeet_view_gen(seq,scan_num,charge,precusor_mz,filename,mz_2d_array,html_out='F:/Colon/prosit/top100_prosit_spectrum/test.html')

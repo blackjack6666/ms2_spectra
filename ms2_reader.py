@@ -82,6 +82,8 @@ def target_peptide_file_spec_getter(target_pep_list:list,psm_tsv_path:str):
 if __name__=='__main__':
     from glob import glob
     import pickle as ppp
+    import pandas as pd
+    from collections import defaultdict
 
     psm_tsv = 'F:/alanine_tailing/search/open_search/chymo_open_search/Tarpt_HS_chymo/psm.tsv'
 
@@ -92,13 +94,18 @@ if __name__=='__main__':
     # ms2_path = 'F:/XS/c_elegans/PXD001723/'
     #
     # ms2_list = glob(ms2_path + '*_clean.ms2')
-    ms2_list = glob('F:/alanine_tailing/2022_03_07/*Chymo_clean.ms2')
-    file_spec_no_list_dict = target_peptide_file_spec_getter(pep_list, psm_tsv)
+    ms2_list = glob('F:/Colon/ms2/*_clean.ms2')
+    # file_spec_no_list_dict = target_peptide_file_spec_getter(pep_list, psm_tsv)
+    df = pd.read_csv('F:/Colon/overlapped_target_PSM_from_unfilter.csv')
+    file_spec_no_list_dict = defaultdict(list)
+    for f, spec_no in zip(df['file_name'],df['spec_no']):
+        file_spec_no_list_dict[f].append(spec_no)
+
     print(file_spec_no_list_dict)
 
     ms2_dict_of_dict = {
-        each: target_ms2_info_reader(each, file_spec_no_list_dict[each.split('\\')[-1].split('_clean')[0]]) for each in
+        each.split('\\')[-1].split('_clean')[0]: target_ms2_info_reader(each, file_spec_no_list_dict[each.split('\\')[-1].split('_clean')[0]]) for each in
         ms2_list}
 
     ppp.dump(ms2_dict_of_dict,
-             open('F:/alanine_tailing/2022_03_07/SHPQFEKAARLMSAAA_psms.p', 'wb'))
+             open('F:/Colon/ms2/ms2_dict_of_dict_target.p', 'wb'))

@@ -12,13 +12,32 @@ def b_y_ion_gen(peptide_seq_charge):
     """
     from aa_mass_table import aa_mass_table,h_oh_mass_dict
     peptide_seq = peptide_seq_charge[:-1]
+    # if M oxidation is in the sequence
+    if 'M(ox)' in peptide_seq:
+        peptide_seq_list = []
+        for i,j in enumerate(peptide_seq):
+            if j != 'M' and j in aa_mass_table:
+                peptide_seq_list.append(j)
+            elif j == 'M':
+                try:
+                    if peptide_seq[i+1] == '(':
+                        peptide_seq_list.append('M(ox)')
+                    else:
+                        peptide_seq_list.append('M')
+                except IndexError: # M is the last aa
+                    peptide_seq_list.append('M')
+            else:
+                continue
+    else:
+        peptide_seq_list = [a for a in peptide_seq]
+    # print (peptide_seq_list)
     ion_list = []
-    rev_peptide_seq = peptide_seq[::-1]
+    rev_peptide_seq = peptide_seq_list[::-1]
 
-    for i in range(len(peptide_seq)):
+    for i in range(len(peptide_seq_list)):
         b_ion = h_oh_mass_dict['H']  # N-terminal adding H
         y_ion = h_oh_mass_dict['OH']  # C-terminal adding OH
-        pep = peptide_seq[:i+1]
+        pep = peptide_seq_list[:i+1]
         rev_pep = rev_peptide_seq[:i+1]
 
         for each_pep in pep:
