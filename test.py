@@ -82,7 +82,7 @@ def ms2_visualize_target(ms2_dict_of_dict, pep_file_spec_no_dict_of_dict,target_
     """
     plot ms2 spectrum
     :param ms2_dict_of_dict: from ms2_reader.py {file:{spec_no:()}}
-    :param pep_file_spec_no_dict_of_dict: {peptidecharge:{file_name:[spec_no1, spec_no2]},peptide:{}}
+    :param pep_file_spec_no_dict_of_dict: {peptide1charge:{file_name:[spec_no1, spec_no2]},peptide2charge:{}}
     :param save_folder: folder to output pngs
     :param target_psm_list: target PSMs list to plot. [psm1charge,psm2charge...]
     :return:
@@ -162,7 +162,7 @@ if __name__=='__main__':
     ms2_dict_of_dict = ppp.load(open('F:/Colon/ms2/ms2_dict_of_dict_target.p','rb'))
     pep_file_spec_dict_of_dict = ppp.load(open('F:/Colon/prosit/pep_file_spec_dict_of_dict.p','rb'))
     cos_sim_df = pd.read_csv('F:/Colon/prosit/cos_sim.csv').sort_values(by=['cos similarity'], ascending=False).iloc[
-                 :100, :]
+                 100:200, :]  # select psm based on cosine similarity score
     psm_charge_list = [psm + str(charge) for psm, charge in zip(cos_sim_df['PSM'], cos_sim_df['charge'])]
-    output_folder = 'F:/Colon/prosit/top100_real_spectrum/'
+    output_folder = 'F:/Colon/prosit/top100_200_real_spectrum/'
     ms2_visualize_target(ms2_dict_of_dict,pep_file_spec_dict_of_dict,psm_charge_list,output_folder)

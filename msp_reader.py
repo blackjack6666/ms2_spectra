@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import spectrum_utils.plot as sup
 import spectrum_utils.spectrum as sus
 from tsv_reader import peptide_charge_getter, peptide_counting, dta_charge_reader
-
+import os
 
 def prosit_csv_output(extended_pep_list,output_path,peptide_file_path):
     """
@@ -81,7 +81,8 @@ def msp_reader(msp_file_path):
 
 def ms2_visulizer(msp_info_dict:dict, saved_file_path:str, input_file:str, target_list=None):
     """
-    plot the ms2 peak give spectrum number and peptide sequence
+    plot the ms2 peak give spectrum number and peptide sequence (this function is not working anymore due to upgrade
+    for spectrum utils, use ms2_visulizer2 instead)
     -----
     :param msp_info_dict: spectra_no as key, (mz, ret_time, charge1,charge2, mass_array,intensity arrary) as value
     :return: ms2 peak plot
@@ -146,50 +147,51 @@ def ms2_visulizer2(msp_info_dict:dict, saved_file_path:str, input_file:str, targ
     for each in target_list:
 
         pep_seq, charge1, precursor_moz, m_over_z, m_array, int_array = msp_info_dict[each]
-        m_array = np.array(m_array, dtype=float)
-        int_array = np.array(int_array,dtype=float)
-        # add one value before and after m_array and int_array to make the range same
+        if not os.path.exists(saved_file_path+pep_seq+'_'+str(charge1)+'_'+input_file+'.png'):
+            m_array = np.array(m_array, dtype=float)
+            int_array = np.array(int_array,dtype=float)
+            # add one value before and after m_array and int_array to make the range same
 
-        m_array = np.append(m_array,2000)
-        m_array = np.insert(m_array,0,1)
-        int_array = np.append(int_array,np.max(int_array)*0.006)
-        int_array = np.insert(int_array,0,np.max(int_array)*0.006)
-        #print(m_array, int_array)
-        # Create the MS/MS spectrum.
-        test_spec = sus.MsmsSpectrum('identifier', m_over_z, int(charge1), m_array, int_array)
-        pep_seq_1 = pep_seq.replace('M(ox)','M[+15.9949]')
-        test_spec.annotate_proforma(pep_seq_1, fragment_tol_mass=50, fragment_tol_mode="ppm", ion_types="aby")
+            m_array = np.append(m_array,2000)
+            m_array = np.insert(m_array,0,1)
+            int_array = np.append(int_array,np.max(int_array)*0.006)
+            int_array = np.insert(int_array,0,np.max(int_array)*0.006)
+            #print(m_array, int_array)
+            # Create the MS/MS spectrum.
+            test_spec = sus.MsmsSpectrum('identifier', m_over_z, int(charge1), m_array, int_array)
+            pep_seq_1 = pep_seq.replace('M(ox)','M[+15.9949]')
+            test_spec.annotate_proforma(pep_seq_1, fragment_tol_mass=50, fragment_tol_mode="ppm", ion_types="aby")
 
-        fig, ax = plt.subplots(figsize=(12, 8))
+            fig, ax = plt.subplots(figsize=(12, 8))
 
-        sup.spectrum(test_spec, grid=False, ax=ax)
+            sup.spectrum(test_spec, grid=False, ax=ax)
 
-    # Process the MS/MS spectrum.
-    #     fragment_tol_mass = 50
-    #     fragment_tol_mode = 'ppm'
-    #     try:
-    #         spectrum = (spectrum.set_mz_range(min_mz=None, max_mz=None)
-    #                     .remove_precursor_peak(fragment_tol_mass, fragment_tol_mode)
-    #                     .filter_intensity(min_intensity=0.0005, max_num_peaks=8000)
-    #                     .scale_intensity()
-    #                     .annotate_peptide_fragments(fragment_tol_mass, fragment_tol_mode,
-    #                                     ion_types='by'))
-    #     except ValueError:
-    #         print (each)
-    # Plot the MS/MS spectrum.
-    #     fig, ax = plt.subplots(figsize=(12, 6))
-    #     sup.spectrum(spectrum,grid=False,ax=ax)
-        plt.title(str(pep_seq)+' '+input_file+' '+ ' charge: '+str(charge1)+
-                ' precursor mass: '+str(precursor_moz*charge1))
-        plt.savefig(saved_file_path+pep_seq+'_'+str(charge1)+'_'+input_file+'.png')
-        #plt.show()
-        plt.close()
+        # Process the MS/MS spectrum.
+        #     fragment_tol_mass = 50
+        #     fragment_tol_mode = 'ppm'
+        #     try:
+        #         spectrum = (spectrum.set_mz_range(min_mz=None, max_mz=None)
+        #                     .remove_precursor_peak(fragment_tol_mass, fragment_tol_mode)
+        #                     .filter_intensity(min_intensity=0.0005, max_num_peaks=8000)
+        #                     .scale_intensity()
+        #                     .annotate_peptide_fragments(fragment_tol_mass, fragment_tol_mode,
+        #                                     ion_types='by'))
+        #     except ValueError:
+        #         print (each)
+        # Plot the MS/MS spectrum.
+        #     fig, ax = plt.subplots(figsize=(12, 6))
+        #     sup.spectrum(spectrum,grid=False,ax=ax)
+            plt.title(str(pep_seq)+' '+input_file+' '+ ' charge: '+str(charge1)+
+                    ' precursor mass: '+str(precursor_moz*charge1))
+            plt.savefig(saved_file_path+pep_seq+'_'+str(charge1)+'_'+input_file+'.png')
+            #plt.show()
+            plt.close()
 
 
 if __name__=='__main__':
     import pickle as ppp
     import pandas as pd
-    peptsv = 'F:/alanine_tailing/search/open_search/chymo_open_search/Tarpt_HS_chymo/peptide.tsv'
+    # peptsv = 'F:/alanine_tailing/search/open_search/chymo_open_search/Tarpt_HS_chymo/peptide.tsv'
     #pep_list = peptide_counting(tsv_path)
     # peptide = ['TSYSEFLSQLANQYASCLKGDG']
     #dta_path = 'C:/uic/lab/mankin/dta_results/dta_242_20aa_normal_fs/api05/'
@@ -206,10 +208,10 @@ if __name__=='__main__':
 
     # Colon datasets from Cornell
     info_dict = msp_reader('F:/Colon/prosit/myPrositLib.msp')
-    cos_sim_df = pd.read_csv('F:/Colon/prosit/cos_sim.csv').sort_values(by=['cos similarity'],ascending=False).iloc[:100,:]
+    cos_sim_df = pd.read_csv('F:/Colon/prosit/cos_sim.csv').sort_values(by=['cos similarity'],ascending=False).iloc[100:200,:]
     psm_charge_list = [psm+str(charge) for psm,charge in zip(cos_sim_df['PSM'],cos_sim_df['charge'])]
     print (psm_charge_list)
     #
-    ms2_visulizer2(info_dict, 'F:/Colon/prosit/top100_prosit_spectrum/', 'prosit_predict',target_list=psm_charge_list)
+    ms2_visulizer2(info_dict, 'F:/Colon/prosit/top100_200_prosit_spectrum/', 'prosit_predict',target_list=psm_charge_list)
     # from b_y_ion_gene import b_y_ion_gen
     # print (b_y_ion_gen('LM(ox)ITAM(ox)RPK3'))
