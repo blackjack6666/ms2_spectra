@@ -155,6 +155,120 @@ def psm_reader(psm_path):
             ret_pep_dict[retention_time] = pep_seq
     return pep_spec_count_dict, ret_pep_dict
 
+
+def peptide_charge_getter(peptide_tsv_file:str):
+    """
+    -----
+    get charge for each peptide sequence
+    -----
+    :param tsv_path:
+    :return:
+    """
+    peptide_charge_dict = defaultdict(list)
+    with open(peptide_tsv_file, 'r') as file_open:
+        next(file_open)
+        for line in file_open:
+            line_split = line.split("\t")
+            peptide_seq = line_split[0]
+            charge = line_split[2]
+            if ',' in charge:
+                peptide_charge_dict[peptide_seq].append(int(charge.split(',')[0]))
+                peptide_charge_dict[peptide_seq].append(int(charge.split(',')[1]))
+            else:
+                peptide_charge_dict[peptide_seq].append(int(charge))
+    return peptide_charge_dict
+
+
+def dta_charge_reader(file_location_path):
+    """
+    -----
+    read peptide seq, PSM, protein ID from dta files
+    -----
+    :param file_location_path: could be str folder path or dta file path or list of dta files or folder path
+    :return: peptide list, PSM dictionary showing number of PSM, protein ID list
+    """
+    from glob import glob
+    from collections import defaultdict
+
+    dta_files = []
+
+    # single dta read
+    if isinstance(file_location_path,str) and file_location_path.endswith('.dta'):
+        dta_files = [file_location_path]
+        print ('reading single dta file')
+
+    # dta folder read
+    elif isinstance(file_location_path,str) and not file_location_path.endswith('.dta'):
+        dta_files = glob(file_location_path + '*.dta')
+        print ('reading single folder')
+
+    # multiple dta files read or multiple dta folder read
+    elif isinstance(file_location_path,list):
+        for each_dta in file_location_path:
+            # when parameter is dta file
+
+            if each_dta.endswith('.dta'):
+               dta_files.append(each_dta)
+
+            # when parameter is a folder path
+            else:
+                dta_files += glob(each_dta+'*.dta')
+    else:
+        raise ValueError('parameter should be string folder path or dta file path or list of dta files or folder paths')
+
+    # exclude wash and hela files
+    clean_dta_files = []
+    for each in dta_files:
+        wash_hela = 0
+        for word in ['wash', 'Wash', 'WASH', 'Hela', 'hela', 'HELA']:
+            if word in each:
+                wash_hela += 1
+                break
+        if wash_hela == 0:
+            clean_dta_files.append(each)
+
+    print (clean_dta_files)
+
+    # read info.
+
+    seq_charge_dict = defaultdict(list)
+    for dta_file in clean_dta_files:
+        with open(dta_file, 'r') as file_open:
+            for i in range(29):
+                next(file_open)
+            Reverse_start = 0
+            for line in file_open:
+                line_split = line.split('\t')
+                if line.startswith('Reverse_') or line.startswith('Rev_'):
+                    Reverse_start = 1
+                elif line.startswith('sp') or line.startswith('tr'):
+                    Reverse_start = 0
+
+                elif len(line_split) == 15 and Reverse_start == 0:
+                    pep_seq = line_split[-1].split('.')[1]
+                    charge = int(line_split[1].split('.')[-1])
+                    seq_charge_dict[pep_seq].append(charge)
+
+    seq_charge_dict = {each:list(set(seq_charge_dict[each])) for each in seq_charge_dict}
+    return seq_charge_dict
+
+
+def pep_probability_getter(pep_tsv_path:str):
+    """
+    get peptide probability from tsv file
+    :param pep_tsv_path:
+    :return:
+    """
+    peptide_prob_dict = {}
+    with open(pep_tsv_path, 'r') as file_open:
+        next(file_open)
+        for line in file_open:
+            line_split = line.split("\t")
+            peptide_seq = line_split[0]
+            probability = float(line_split[3])
+            peptide_prob_dict[peptide_seq]=probability
+    return peptide_prob_dict
+
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     from matplotlib_venn import venn3, venn3_circles

@@ -16,7 +16,7 @@ def peptide_spectra_dict(psm_tsv:str):
             info_dict[pep_seq].append(spectra_number)
     return info_dict
 
-def peptide_file_spectra_dict(psm_tsv:str):
+def peptide_file_spectra_dict(psm_tsv:str, fragpipe=15.0):
     """
     get peptide-file-spectra dictionary
     :param psm_tsv:
@@ -29,11 +29,42 @@ def peptide_file_spectra_dict(psm_tsv:str):
             next(f)
         for line in f:
             line_split = line.split('\t')
-            pep_seq = line_split[1]
+            pep_seq = line_split[2] if fragpipe == 15.0 else line_split[1]
             spectra_number = int(line_split[0].split('.')[-2])
             file_name = line_split[0].split('.')[0]
             info_dict[pep_seq].append((file_name,spectra_number))
     return info_dict
+
+
+def peptide_file_spec_dict_of_dict(psm_tsv:str):
+    """
+    {pep1:{file1:[spec1,spec2], file2:[spec1,spec2]}, pep2:{}}
+    :param psm_tsv:
+    :return:
+    """
+    from collections import defaultdict
+    info_dict = defaultdict(list)
+
+    with open(psm_tsv, 'r') as f:
+        for i in range(1):
+            next(f)
+        for line in f:
+            line_split = line.split('\t')
+            pep_seq = line_split[1]
+            charge = line_split[0].split('.')[-1]
+            spectra_number = int(line_split[0].split('.')[-2])
+            file_name = line_split[0].split('.')[0]
+            info_dict[pep_seq+charge].append((file_name,spectra_number))
+
+    new_info_dict = {}  # dictionary structure change
+    for each in info_dict:
+        file_spec_list_dict = defaultdict(list)
+        for each_tuple in info_dict[each]:
+            file_spec_list_dict[each_tuple[0]].append(each_tuple[1])
+        new_info_dict[each] = file_spec_list_dict
+
+    return new_info_dict
+
 
 def  spectra_info_generator(psm_tsv):
     """
@@ -52,6 +83,7 @@ def  spectra_info_generator(psm_tsv):
             info_dict[file_spectra_number] = info
     return info_dict
 
+
 def peptide_spectra_dict2(psm_tsv:str):
     """
 
@@ -69,7 +101,9 @@ def peptide_spectra_dict2(psm_tsv:str):
             spectra_number = line_split[0]  # file_name_spectra_number
             info_dict[pep_seq].append(spectra_number)
     return info_dict
-def peptide_file_spectra_generator(psm_tsv:str):
+
+
+def peptide_file_spectra_generator(psm_tsv:str,fragpipe=15.0):
     """
     get peptide-file-spectra-infomation, for multiple file search together
     -----
@@ -84,14 +118,88 @@ def peptide_file_spectra_generator(psm_tsv:str):
             next(f)
         for line in f:
             line_split = line.split('\t')
-            pep_seq = line_split[1]
+            pep_seq = line_split[2] if fragpipe == 15.0 else line_split[1]
             file_name = line_split[0].split('.')[0]
             spectra_number = int(line_split[0].split('.')[-2])
-            pep_seq_mod = pep_seq if line_split[2] == '' else line_split[2]
+            pep_seq_mod = pep_seq if line_split[3] == '' else line_split[3]
             info_dict[pep_seq].append((file_name,spectra_number,pep_seq_mod))
 
     return info_dict
 
+
+def dta_file_spectra_generator(file_location_path:str):
+    """
+    -----
+    get peptide-file-spectra-infomation from dta files
+    -----
+    :param dta_file_location:
+    :return:
+    """
+    from glob import glob
+    from collections import defaultdict
+
+    dta_files = []
+
+    # single dta read
+    if isinstance(file_location_path, str) and file_location_path.endswith('.dta'):
+        dta_files = [file_location_path]
+        print('reading single dta file')
+
+    # dta folder read
+    elif isinstance(file_location_path, str) and not file_location_path.endswith('.dta'):
+        dta_files = glob(file_location_path + '*.dta')
+        print('reading single folder')
+
+    # multiple dta files read or multiple dta folder read
+    elif isinstance(file_location_path, list):
+        for each_dta in file_location_path:
+            # when parameter is dta file
+
+            if each_dta.endswith('.dta'):
+                dta_files.append(each_dta)
+
+            # when parameter is a folder path
+            else:
+                dta_files += glob(each_dta + '*.dta')
+    else:
+        raise ValueError('parameter should be string folder path or dta file path or list of dta files or folder paths')
+
+    # exclude wash and hela files
+    clean_dta_files = []
+    for each in dta_files:
+        wash_hela = 0
+        for word in ['wash', 'Wash', 'WASH', 'Hela', 'hela', 'HELA']:
+            if word in each:
+                wash_hela += 1
+                break
+        if wash_hela == 0:
+            clean_dta_files.append(each)
+
+    print(clean_dta_files)
+
+    # read info.
+
+    info_dict = defaultdict(list)
+    for dta_file in clean_dta_files:
+        with open(dta_file, 'r') as file_open:
+            for i in range(29):
+                next(file_open)
+            Reverse_start = 0
+            for line in file_open:
+                line_split = line.split('\t')
+                if line.startswith('Reverse_') or line.startswith('Rev_'):
+                    Reverse_start = 1
+                elif line.startswith('sp') or line.startswith('tr'):
+                    Reverse_start = 0
+
+                elif len(line_split) == 15 and Reverse_start == 0:
+                    pep_seq = line_split[-1].split('.')[1]
+                    file_name = line_split[1].split('.')[0]
+                    spectra_number = int(line_split[1].split('.')[-2])
+                    pep_seq_mod = pep_seq
+                    info_dict[pep_seq].append((file_name,spectra_number,pep_seq_mod))
+
+    return info_dict
 
 def dta_info_reader(dta_file):
 
@@ -158,7 +266,6 @@ def psm_compare(psm_path1,psm_path2,target_peptide):
     return same_spectrum_count
 
 
-psm_path1 = 'D:/data/Mankin/search_result/20200129_merged_gln_tyr/ctrl/psm.tsv'
-psm_path2 = 'D:/data/Mankin/search_result/20200129_noextension_databs/ctrl/psm.tsv'
-target_peptide = 'NVVVVYR'
-psm_compare(psm_path1,psm_path2,target_peptide)
+if __name__== "__main__":
+    psm_path = 'D:/data/ext_evo_pj/gb_ref_search_7_7_PXD001723/psm.tsv'
+    print (peptide_file_spec_dict_of_dict(psm_path))
